@@ -1,0 +1,14 @@
+{% load menu_tags %}<!doctype html>
+<html lang="{{ lang }}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ menu.name }}</title></head>
+<body>
+{# Placeholder until the themed template lands. #}
+<h1>{{ menu.name }}</h1>
+{% for l in menu.languages %}<a href="{{ l.url }}">{{ l.short }}</a> {% endfor %}
+{% for sp in menu.specials %}<p><strong>{{ sp.kind_label }}</strong> {{ sp.title }} {% for p in sp.prices %}{{ p.label }} {{ p.amount }} {% endfor %}</p>{% endfor %}
+{% for cat in menu.categories %}<section id="{{ cat.anchor }}"><h2>{{ cat.name }}</h2>
+{% for it in cat.items %}<article id="{{ it.anchor }}"><h3>{{ it.name }}</h3><p>{{ it.description }}</p>
+<p>{% for p in it.prices %}{{ p.label }} {{ p.amount }}{% if not forloop.last %} / {% endif %}{% endfor %}</p>
+{% if it.sold_out %}<p>{{ s.sold_out }}</p>{% endif %}</article>{% endfor %}</section>{% endfor %}
+</body></html>
