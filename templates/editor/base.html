@@ -1,0 +1,17 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>{% block title %}QR Menu Studio{% endblock %}</title>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+{# Base layout. Blocks: title, extra_head, content, extra_js. Optional context: restaurant. #}
+<header><a href="{% url 'editor:dashboard' %}">QR Menu Studio</a>{% if restaurant %} / <a href="{% url 'editor:restaurant_edit' restaurant.pk %}">{{ restaurant.name }}</a>{% endif %}</header>
+{% if messages %}<ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+<main>{% block content %}{% endblock %}</main>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
