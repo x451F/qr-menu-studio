@@ -147,7 +147,9 @@ def load_restaurant(slug: str):
     )
 
 
-def build_menu_context(restaurant: Restaurant, lang: str, *, theme=None, mode=None, preview=False) -> dict:
+def build_menu_context(
+    restaurant: Restaurant, lang: str, *, theme=None, mode=None, preview=False, hide_photos=False
+) -> dict:
     from .strings import strings_for
     from .theming import build_theme_vars
 
@@ -164,7 +166,7 @@ def build_menu_context(restaurant: Restaurant, lang: str, *, theme=None, mode=No
         for it in cat.items.all():
             used_allergens.update(it.allergens or [])
             used_diets.update(it.diets or [])
-            photo = _photo(it)
+            photo = None if hide_photos else _photo(it)
             has_photos = has_photos or photo is not None
             items.append(
                 ItemView(

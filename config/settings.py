@@ -148,7 +148,9 @@ if not DEBUG and PUBLIC_BASE_URL.startswith("https://"):
 # AI (Claude). Feature is disabled when the key is missing.
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
 ANTHROPIC_MODEL = env("ANTHROPIC_MODEL", "claude-opus-5-5")
-AI_ENABLED = bool(ANTHROPIC_API_KEY)
+# AI_FAKE=1 returns canned results without calling the API (tests, e2e, demos offline).
+AI_FAKE = env_bool("AI_FAKE", False)
+AI_ENABLED = bool(ANTHROPIC_API_KEY) or AI_FAKE
 
 LOGGING = {
     "version": 1,

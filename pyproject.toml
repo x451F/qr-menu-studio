@@ -37,4 +37,4 @@ extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "DJ"]
-ignore = ["E501", "E731"]
+ignore = ["E501", "E731", "DJ012"]

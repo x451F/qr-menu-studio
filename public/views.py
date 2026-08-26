@@ -38,6 +38,7 @@ def menu(request, slug):
         theme=request.GET.get("theme") if preview else None,
         mode=request.GET.get("mode") if preview else None,
         preview=preview,
+        hide_photos=preview and request.GET.get("photos") == "0",
     )
     response = render(request, "public/menu.html", ctx)
     if set_cookie and not preview:
