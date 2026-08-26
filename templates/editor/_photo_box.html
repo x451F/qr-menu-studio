@@ -1,0 +1,11 @@
+{% load editor_tags %}{% photo_data item.photo as ph %}<div class="photo-box" id="photo-box-{{ item.pk }}">
+  <form hx-post="{% url 'editor:item_photo' item.pk %}" hx-encoding="multipart/form-data" hx-trigger="change" hx-target="#photo-box-{{ item.pk }}" hx-swap="outerHTML" class="photo-box__form">
+    <div class="field__label">Photo</div>
+    <div class="photo-box__row">
+      {% if ph %}<img class="photo-box__img" src="{{ ph.src }}"{% if ph.srcset %} srcset="{{ ph.srcset }}" sizes="120px"{% endif %} alt="" width="72" height="72" loading="lazy">{% endif %}
+      <label class="btn"><input type="file" name="photo" accept="image/*" class="visually-hidden">{% icon 'camera' %}<span>{% if ph %}Replace photo{% else %}Add photo{% endif %}</span></label>
+      {% if ph %}<button type="button" class="btn btn--ghost" hx-post="{% url 'editor:item_photo' item.pk %}" hx-vals='{"remove": "1"}' hx-target="#photo-box-{{ item.pk }}" hx-swap="outerHTML" hx-encoding="application/x-www-form-urlencoded">Remove</button>{% endif %}
+    </div>
+    {% if error %}<div class="field-error" role="alert">{{ error }}</div>{% endif %}
+  </form>
+</div>

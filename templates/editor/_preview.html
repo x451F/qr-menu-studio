@@ -1,0 +1,23 @@
+{% load editor_tags %}<aside class="preview" id="preview" aria-label="Live preview" data-base="{{ preview_base }}" data-theme="{{ restaurant.theme }}" data-mode="{{ restaurant.color_mode }}" data-settings-url="{% url 'editor:restaurant_settings' restaurant.pk %}">
+  <div class="preview__bar">
+    <div class="preview__title">
+      <strong>Live preview</strong>
+      <span class="preview__hint">Try a look, nothing is saved until you tap “Use this theme”.</span>
+      <button type="button" class="btn btn--ghost btn--icon preview__close" data-preview-close aria-label="Close preview">{% icon 'x' %}</button>
+    </div>
+    <div class="chips chips--scroll" role="group" aria-label="Theme">
+      {% for code, t in themes.items %}<button type="button" class="chip{% if code == restaurant.theme %} is-active{% endif %}" data-theme="{{ code }}" aria-pressed="{% if code == restaurant.theme %}true{% else %}false{% endif %}">{{ t.label }}</button>{% endfor %}
+    </div>
+    <div class="preview__opts">
+      <div class="seg" role="group" aria-label="Colour mode">
+        <button type="button" class="seg__btn{% if restaurant.color_mode == 'light' %} is-active{% endif %}" data-mode="light" aria-pressed="{% if restaurant.color_mode == 'light' %}true{% else %}false{% endif %}">Light</button>
+        <button type="button" class="seg__btn{% if restaurant.color_mode == 'dark' %} is-active{% endif %}" data-mode="dark" aria-pressed="{% if restaurant.color_mode == 'dark' %}true{% else %}false{% endif %}">Dark</button>
+      </div>
+      <label class="check"><input type="checkbox" data-photos checked><span>Photos</span></label>
+      <button type="button" class="btn btn--sm btn--primary" data-use-theme hidden>Use this theme</button>
+    </div>
+  </div>
+  <div class="phone">
+    <div class="phone__screen"><iframe class="phone__frame" title="Menu preview" data-frame></iframe></div>
+  </div>
+</aside>

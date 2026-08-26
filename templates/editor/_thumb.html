@@ -1,0 +1,1 @@
+{% load editor_tags %}{% photo_data item.photo as ph %}<span class="thumb{% if not ph %} thumb--empty{% endif %}" id="thumb-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>{% if ph %}<img src="{{ ph.src }}"{% if ph.srcset %} srcset="{{ ph.srcset }}" sizes="56px"{% endif %} alt="" width="44" height="44" loading="lazy">{% endif %}</span>

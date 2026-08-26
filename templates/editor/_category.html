@@ -1,0 +1,35 @@
+{% load editor_tags %}<section class="cat{% if not category.is_visible %} is-hidden{% endif %}" id="cat-{{ category.pk }}" data-id="{{ category.pk }}" data-cat>
+  <header class="cat__head">
+    <span class="drag-handle cat-handle" title="Drag to reorder categories" aria-label="Drag to reorder category">{% icon 'grip' %}</span>
+    <form class="cat__form" hx-post="{% url 'editor:category_update' category.pk %}" hx-trigger="change, input delay:600ms" hx-swap="none" data-autosave>
+      {% include "editor/_tfield.html" with name="name" value=category.name key="cat-name" placeholder="Category name, e.g. Entrées" big=True %}
+      <div class="cat__desc{% if category.description.fr or category.description.en %} is-open{% endif %}">
+        {% include "editor/_tfield.html" with name="description" value=category.description key="cat-desc" placeholder="Description (optional), e.g. Served with fries" %}
+      </div>
+    </form>
+    <div class="cat__controls">
+      {% url 'editor:category_toggle' category.pk as vis_url %}
+      {% include "editor/_toggle.html" with url=vis_url on=category.is_visible kind="cat_visible" %}
+      <button type="button" class="btn btn--ghost btn--icon" data-collapse title="Collapse / expand" aria-label="Collapse or expand category">{% icon 'chevron' 'cat__chev' %}</button>
+      <details class="menu">
+        <summary class="btn btn--ghost btn--icon" aria-label="Category options">{% icon 'more' %}</summary>
+        <div class="menu__panel">
+          <button type="button" class="menu__item" data-cat-desc-toggle>Add description</button>
+          <button type="button" class="menu__item menu__item--danger" hx-post="{% url 'editor:category_delete' category.pk %}" hx-target="#cat-{{ category.pk }}" hx-swap="outerHTML" hx-confirm="Delete this category and all its items? This cannot be undone.">Delete category</button>
+        </div>
+      </details>
+    </div>
+  </header>
+  <div class="cat__body">
+    <div class="items" id="items-{{ category.pk }}" data-category="{{ category.pk }}">{% include "editor/_items_list.html" %}</div>
+    <form class="quick-add" hx-post="{% url 'editor:item_add' category.pk %}" hx-target="#items-{{ category.pk }}" hx-swap="beforeend" data-quick-add>
+      <input class="input" type="text" name="name_fr" placeholder="Add an item…" autocomplete="off" enterkeyhint="next" aria-label="New item name">
+      <div class="price-row__amount quick-add__price">
+        <input class="input price-input" type="text" inputmode="decimal" name="price_amount" placeholder="Price" autocomplete="off" enterkeyhint="done" aria-label="New item price">
+        <span class="price-row__eur" aria-hidden="true">€</span>
+      </div>
+      <button class="btn btn--primary" type="submit">{% icon 'plus' %}<span>Add</span></button>
+      <div id="qa-err-{{ category.pk }}" class="field-error quick-add__err" role="alert"></div>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+{% load editor_tags %}{% comment %}
+Translatable field. Context: name (form name prefix), value (dict fr/en), label, multiline, key, placeholder, big, rows, hint, side.
+In the menu editor an ancestor [data-lang] shows only the active language; elsewhere (side=True) both are shown.
+{% endcomment %}
+<div class="tfield{% if big %} tfield--big{% endif %}{% if side %} tfield--side{% endif %}" data-tkey="{{ key }}">
+  {% if label %}<div class="field__label">{{ label }}{% if not side %}<span class="lang-tag lf-fr">FR</span><span class="lang-tag lf-en">EN</span>{% endif %}</div>{% endif %}
+  <div class="tfield__row">
+    <div class="tf-cell lf-fr">{% if side %}<span class="tf-tag">FR</span>{% endif %}
+      {% if multiline %}<textarea class="input" name="{{ name }}_fr" data-lang="fr" rows="{{ rows|default:2 }}" placeholder="{{ placeholder }}" aria-label="{{ label|default:placeholder }} (French)">{{ value.fr }}</textarea>
+      {% else %}<input class="input" type="text" name="{{ name }}_fr" data-lang="fr" value="{{ value.fr }}" placeholder="{{ placeholder }}" autocomplete="off" aria-label="{{ label|default:placeholder }} (French)">{% endif %}
+    </div>
+    <div class="tf-cell lf-en">{% if side %}<span class="tf-tag">EN</span>{% endif %}
+      {% if multiline %}<textarea class="input{% if value.fr and not value.en %} is-missing{% endif %}" name="{{ name }}_en" data-lang="en" rows="{{ rows|default:2 }}" placeholder="{{ value.fr|default:placeholder }}" aria-label="{{ label|default:placeholder }} (English)">{{ value.en }}</textarea>
+      {% else %}<input class="input{% if value.fr and not value.en %} is-missing{% endif %}" type="text" name="{{ name }}_en" data-lang="en" value="{{ value.en }}" placeholder="{{ value.fr|default:placeholder }}" autocomplete="off" aria-label="{{ label|default:placeholder }} (English)">{% endif %}
+    </div>
+    {% if AI_ENABLED %}<button type="button" class="btn btn--sm btn--ghost tr-btn lf-en" data-translate title="Translate from French with AI">{% icon 'sparkle' %}<span>Translate</span></button>{% endif %}
+  </div>
+  {% if hint %}<p class="hint">{{ hint }}</p>{% endif %}
+</div>

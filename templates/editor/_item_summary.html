@@ -1,0 +1,4 @@
+{% load editor_tags %}<span class="item-summary" id="sum-item-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <span class="item-summary__name"><span class="lf-fr">{% if item.name.fr %}{{ item.name.fr }}{% else %}<em>Untitled item</em>{% endif %}</span><span class="lf-en{% if not item.name.en %} is-missing{% endif %}">{% if item.name.en %}{{ item.name.en }}{% elif item.name.fr %}{{ item.name.fr }}{% else %}<em>Untitled item</em>{% endif %}</span></span>
+  <span class="item-summary__price">{% if item.prices %}{{ item.prices|summary_price }}{% else %}<em>No price</em>{% endif %}</span>
+</span>

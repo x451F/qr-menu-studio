@@ -1,0 +1,51 @@
+{% load editor_tags %}<article class="item{% if open %} is-open{% endif %}{% if item.is_sold_out %} is-soldout{% endif %}{% if not item.is_visible %} is-hidden{% endif %}" id="item-{{ item.pk }}" data-id="{{ item.pk }}" data-item>
+  <div class="item__head">
+    <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder">{% icon 'grip' %}</span>
+    {% include "editor/_thumb.html" %}
+    <button type="button" class="item__main" data-toggle-open aria-expanded="{% if open %}true{% else %}false{% endif %}" aria-controls="item-body-{{ item.pk }}">
+      {% include "editor/_item_summary.html" %}
+      {% icon 'chevron' 'item__chev' %}
+    </button>
+    <div class="item__controls">
+      {% url 'editor:item_toggle' item.pk 'is_sold_out' as sold_url %}
+      {% include "editor/_toggle.html" with url=sold_url on=item.is_sold_out kind="soldout" %}
+      {% url 'editor:item_toggle' item.pk 'is_visible' as vis_url %}
+      {% include "editor/_toggle.html" with url=vis_url on=item.is_visible kind="item_visible" %}
+    </div>
+  </div>
+  <div class="item__body" id="item-body-{{ item.pk }}">
+    <form class="item__form" hx-post="{% url 'editor:item_update' item.pk %}" hx-trigger="change, input delay:600ms" hx-swap="none" data-autosave>
+      <input type="hidden" name="_chips" value="1">
+      {% include "editor/_tfield.html" with name="name" label="Name" value=item.name key="name" placeholder="Dish name" %}
+      {% include "editor/_tfield.html" with name="description" label="Description" value=item.description key="description" placeholder="Short description (optional)" multiline=True %}
+      {% include "editor/_prices.html" with rows=item.prices|price_rows multi=item.prices|prices_multi %}
+      <fieldset class="chips-block">
+        <legend class="field__label">Allergens</legend>
+        <div class="chips">
+          {% for o in item|allergen_options %}
+          <label class="chip chip--tag"><input type="checkbox" name="allergens" value="{{ o.code }}"{% if o.selected %} checked{% endif %}>{% sprite_href 'al' o.code as href %}<svg class="chip__ic" aria-hidden="true">{% if href %}<use href="{{ href }}"></use>{% endif %}</svg><span>{{ o.label }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <fieldset class="chips-block">
+        <legend class="field__label">Diets</legend>
+        <div class="chips">
+          {% for o in item|diet_options %}
+          <label class="chip chip--tag chip--diet"><input type="checkbox" name="diets" value="{{ o.code }}"{% if o.selected %} checked{% endif %}>{% sprite_href 'diet' o.code as href %}<svg class="chip__ic" aria-hidden="true">{% if href %}<use href="{{ href }}"></use>{% endif %}</svg><span>{{ o.label }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <label class="field field--inline">
+        <span class="field__label">Category</span>
+        <select class="input" name="category" data-move>
+          {% for c in all_categories %}<option value="{{ c.pk }}"{% if c.pk == item.category_id %} selected{% endif %}>{{ c.name.fr|default:"Untitled category" }}</option>{% endfor %}
+        </select>
+      </label>
+    </form>
+    {% include "editor/_photo_box.html" %}
+    <div class="item__foot">
+      <button type="button" class="btn" hx-post="{% url 'editor:item_duplicate' item.pk %}" hx-target="#item-{{ item.pk }}" hx-swap="afterend">{% icon 'copy' %}<span>Duplicate</span></button>
+      <button type="button" class="btn btn--danger" hx-post="{% url 'editor:item_delete' item.pk %}" hx-target="#item-{{ item.pk }}" hx-swap="outerHTML">{% icon 'trash' %}<span>Delete</span></button>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,4 @@
+{% load editor_tags %}<span class="item-summary" id="sum-special-{{ special.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <span class="item-summary__name"><span class="kind-badge kind-badge--{{ special.kind }}">{{ special.get_kind_display }}</span> <span class="lf-fr">{% if special.title.fr %}{{ special.title.fr }}{% else %}<em>Untitled</em>{% endif %}</span><span class="lf-en{% if special.title.fr and not special.title.en %} is-missing{% endif %}">{% if special.title.en %}{{ special.title.en }}{% elif special.title.fr %}{{ special.title.fr }}{% else %}<em>Untitled</em>{% endif %}</span></span>
+  <span class="item-summary__price">{% if special.prices %}{{ special.prices|summary_price }}{% else %}<em>No price</em>{% endif %}</span>
+</span>

@@ -1,0 +1,29 @@
+{% load editor_tags %}<article class="item special{% if open %} is-open{% endif %}{% if not special.is_active %} is-inactive{% endif %}" id="special-{{ special.pk }}" data-id="{{ special.pk }}" data-item>
+  <div class="item__head">
+    <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder">{% icon 'grip' %}</span>
+    <button type="button" class="item__main" data-toggle-open aria-expanded="{% if open %}true{% else %}false{% endif %}" aria-controls="special-body-{{ special.pk }}">
+      {% include "editor/_special_summary.html" %}
+      {% icon 'chevron' 'item__chev' %}
+    </button>
+    <div class="item__controls">
+      {% url 'editor:special_toggle' special.pk as act_url %}
+      {% include "editor/_toggle.html" with url=act_url on=special.is_active kind="special_active" %}
+    </div>
+  </div>
+  <div class="item__body" id="special-body-{{ special.pk }}">
+    <form class="item__form" hx-post="{% url 'editor:special_update' special.pk %}" hx-trigger="change, input delay:600ms" hx-swap="none" data-autosave>
+      {% include "editor/_tfield.html" with name="title" label="Title" value=special.title key="title" placeholder="e.g. Blanquette de veau" %}
+      {% include "editor/_tfield.html" with name="description" label="Description" value=special.description key="description" placeholder="Short description (optional)" multiline=True %}
+      {% include "editor/_prices.html" with rows=special.prices|price_rows multi=special.prices|prices_multi %}
+      <label class="field field--inline">
+        <span class="field__label">Type</span>
+        <select class="input" name="kind">
+          {% for code, k in special_kinds.items %}<option value="{{ code }}"{% if code == special.kind %} selected{% endif %}>{{ k.fr }}</option>{% endfor %}
+        </select>
+      </label>
+    </form>
+    <div class="item__foot">
+      <button type="button" class="btn btn--danger" hx-post="{% url 'editor:special_delete' special.pk %}" hx-target="#special-{{ special.pk }}" hx-swap="outerHTML" hx-confirm="Delete this special?">{% icon 'trash' %}<span>Delete</span></button>
+    </div>
+  </div>
+</article>

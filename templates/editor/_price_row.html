@@ -1,0 +1,11 @@
+{% load editor_tags %}<div class="price-row">
+  <div class="price-row__label">
+    <input class="input lf-fr" type="text" name="price_label_fr" value="{{ p.label.fr }}" placeholder="Size / label, e.g. 25 cl" autocomplete="off" aria-label="Price label (French)">
+    <input class="input lf-en" type="text" name="price_label_en" value="{{ p.label.en }}" placeholder="{{ p.label.fr|default:'Size / label, e.g. 25 cl' }}" autocomplete="off" aria-label="Price label (English)">
+  </div>
+  <div class="price-row__amount">
+    <input class="input price-input" type="text" inputmode="decimal" name="price_amount" value="{{ p.cents|cents_input }}" placeholder="0,00" autocomplete="off" aria-label="Price in euros">
+    <span class="price-row__eur" aria-hidden="true">€</span>
+  </div>
+  <button type="button" class="btn btn--ghost btn--icon price-row__remove" data-price-remove title="Remove this price" aria-label="Remove this price">{% icon 'x' %}</button>
+</div>

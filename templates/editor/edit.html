@@ -1,0 +1,95 @@
+{% extends "editor/base.html" %}
+{% load static editor_tags %}
+{% block title %}{{ restaurant.name }} · Menu editor{% endblock %}
+{% block body_class %}page-edit{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<div class="editor" id="editor" data-editor data-lang="fr" data-english="{{ english_on|yesno:'1,0' }}"
+     data-reorder-categories="{% url 'editor:reorder_categories' restaurant.pk %}"
+     data-reorder-items="{% url 'editor:reorder_items' restaurant.pk %}"
+     data-reorder-specials="{% url 'editor:reorder_specials' restaurant.pk %}"
+     data-translate-url="{% url 'ai:translate' %}">
+  <div class="editor__col">
+    <div class="ed-head">
+      <div class="ed-head__title">
+        <a class="back back--icon" href="{% url 'editor:dashboard' %}" aria-label="All restaurants">{% icon 'back' %}</a>
+        <h1 class="h1">{{ restaurant.name }}</h1>
+      </div>
+      {% include "editor/_publish_button.html" %}
+    </div>
+    <nav class="ed-actions" aria-label="Restaurant actions">
+      <a class="btn btn--sm" href="{% url 'editor:restaurant_settings' restaurant.pk %}">{% icon 'sliders' %}<span>Settings</span></a>
+      <a class="btn btn--sm" href="{% url 'printing:print_page' restaurant.pk %}">{% icon 'printer' %}<span>Print &amp; QR</span></a>
+      {% if AI_ENABLED %}<a class="btn btn--sm" href="{% url 'ai:import' restaurant.pk %}">{% icon 'camera' %}<span>Import from photo</span></a>{% endif %}
+      <a class="btn btn--sm" href="{{ restaurant.public_path }}{% if not restaurant.is_published %}?preview=1{% endif %}" target="_blank" rel="noopener">{% icon 'external' %}<span>View public page</span></a>
+    </nav>
+
+    {% if english_on %}
+    <div class="ed-toolbar">
+      <div class="seg seg--lang" role="group" aria-label="Editing language">
+        <span class="seg__label">Editing</span>
+        <button type="button" class="seg__btn is-active" data-set-lang="fr" aria-pressed="true">FR</button>
+        <button type="button" class="seg__btn" data-set-lang="en" aria-pressed="false">EN</button>
+      </div>
+      {% include "editor/_missing_en.html" %}
+      {% if AI_ENABLED %}
+      <button type="button" class="btn btn--sm btn--accent" id="translate-missing" hx-post="{% url 'ai:translate_missing' restaurant.pk %}" hx-swap="none" hx-disabled-elt="this">{% icon 'sparkle' %}<span>Translate missing with AI</span></button>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <section class="panel today" id="today" aria-labelledby="today-title">
+      <div class="panel__head">
+        <h2 class="h2" id="today-title">Today <small>Plat du jour · Formule</small></h2>
+      </div>
+      <div class="specials" id="specials" data-sortable="specials">
+        {% for special in specials %}{% include "editor/_special.html" %}{% endfor %}
+      </div>
+      {% if not specials %}<p class="hint" id="specials-empty">Nothing on the board today. Add the dish of the day or the lunch set menu: it shows at the top of the public menu.</p>{% endif %}
+      <div class="add-row">
+        <button type="button" class="btn" hx-post="{% url 'editor:special_add' restaurant.pk 'plat' %}" hx-target="#specials" hx-swap="beforeend">{% icon 'plus' %}<span>Plat du jour</span></button>
+        <button type="button" class="btn" hx-post="{% url 'editor:special_add' restaurant.pk 'formule' %}" hx-target="#specials" hx-swap="beforeend">{% icon 'plus' %}<span>Formule</span></button>
+        <button type="button" class="btn" hx-post="{% url 'editor:special_add' restaurant.pk 'dessert' %}" hx-target="#specials" hx-swap="beforeend">{% icon 'plus' %}<span>Dessert</span></button>
+        <button type="button" class="btn" hx-post="{% url 'editor:special_add' restaurant.pk 'suggestion' %}" hx-target="#specials" hx-swap="beforeend">{% icon 'plus' %}<span>Suggestion</span></button>
+      </div>
+    </section>
+
+    <div class="cats-head">
+      <h2 class="h2">Menu</h2>
+      {% if categories|length > 1 %}<button type="button" class="btn btn--sm btn--ghost" data-collapse-all>Collapse all</button>{% endif %}
+    </div>
+    <div class="cats" id="categories" data-sortable="categories">
+      {% for category in categories %}{% include "editor/_category.html" %}{% endfor %}
+    </div>
+    {% if not categories %}
+    <div class="panel empty-start" id="empty-state">
+      <h3 class="h3">Start with a category</h3>
+      <p class="muted">Tap one to add it, then type the dishes straight from the paper menu.</p>
+      <div class="chips">
+        {% for fr, en in category_presets.items %}
+        <button type="button" class="chip chip--lg" hx-post="{% url 'editor:category_add' restaurant.pk %}" hx-vals='{"name_fr": "{{ fr }}"}' hx-target="#categories" hx-swap="beforeend">{% icon 'plus' %}{{ fr }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <form class="panel cat-add" hx-post="{% url 'editor:category_add' restaurant.pk %}" hx-target="#categories" hx-swap="beforeend" data-cat-add>
+      <input class="input" type="text" name="name_fr" placeholder="Add a category… e.g. Desserts" autocomplete="off" enterkeyhint="done" aria-label="New category name">
+      <button class="btn btn--primary" type="submit">{% icon 'plus' %}<span>Add category</span></button>
+      <div id="cat-add-error" class="field-error" role="alert"></div>
+    </form>
+  </div>
+
+  {% include "editor/_preview.html" %}
+</div>
+
+<div class="bottombar">
+  <button type="button" class="btn btn--primary btn--lg bottombar__main" data-preview-open>{% icon 'phone' %}<span>Preview</span></button>
+  <a class="btn btn--lg btn--icon" href="{% url 'printing:print_page' restaurant.pk %}" aria-label="Print and QR">{% icon 'printer' %}</a>
+  <a class="btn btn--lg btn--icon" href="{% url 'editor:restaurant_settings' restaurant.pk %}" aria-label="Settings">{% icon 'sliders' %}</a>
+</div>
+
+<template id="tpl-price-row">{% include "editor/_price_row.html" %}</template>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'editor/vendor/Sortable.min.js' %}" defer></script>
+{% endblock %}

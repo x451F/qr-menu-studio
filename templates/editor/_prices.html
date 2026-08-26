@@ -1,0 +1,8 @@
+{% load editor_tags %}<div class="prices{% if multi %} is-multi{% endif %}" data-prices>
+  <div class="field__label">Price</div>
+  <div class="prices__rows">{% for p in rows %}{% include "editor/_price_row.html" %}{% endfor %}</div>
+  <div class="prices__foot">
+    <button type="button" class="btn btn--sm btn--ghost" data-price-add>{% icon 'plus' %}<span>Add size / second price</span></button>
+    <span class="field-error price-error" role="alert"></span>
+  </div>
+</div>
