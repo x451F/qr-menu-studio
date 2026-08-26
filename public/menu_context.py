@@ -12,7 +12,7 @@ Context passed to the template:
 
 from dataclasses import dataclass, field
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, prefetch_related_objects
 
 from menus.constants import ALLERGENS, DIETS, SPECIAL_KINDS, SUPPORTED_LANGUAGES, THEMES
 from menus.formatting import format_price
@@ -131,20 +131,32 @@ def _photo(item) -> PhotoView | None:
         return None
 
 
-def load_restaurant(slug: str):
-    return (
-        Restaurant.objects.filter(slug=slug)
-        .prefetch_related(
-            Prefetch(
-                "categories",
-                queryset=Category.objects.filter(is_visible=True).prefetch_related(
-                    Prefetch("items", queryset=Item.objects.filter(is_visible=True))
-                ),
+def _menu_prefetches():
+    return [
+        Prefetch(
+            "categories",
+            queryset=Category.objects.filter(is_visible=True).prefetch_related(
+                Prefetch("items", queryset=Item.objects.filter(is_visible=True))
             ),
-            "specials",
-        )
-        .first()
-    )
+        ),
+        "specials",
+    ]
+
+
+def get_restaurant(slug: str):
+    """Restaurant row only (1 query); call `prefetch_menu` before `build_menu_context`."""
+    return Restaurant.objects.filter(slug=slug).first()
+
+
+def prefetch_menu(restaurant: Restaurant) -> Restaurant:
+    """Load visible categories, items and specials (3 queries)."""
+    prefetch_related_objects([restaurant], *_menu_prefetches())
+    return restaurant
+
+
+def load_restaurant(slug: str):
+    restaurant = get_restaurant(slug)
+    return prefetch_menu(restaurant) if restaurant else None
 
 
 def build_menu_context(
