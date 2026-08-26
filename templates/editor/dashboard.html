@@ -1,0 +1,42 @@
+{% extends "editor/base.html" %}
+{% load editor_tags %}
+{% block title %}Restaurants · QR Menu Studio{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="h1">Your restaurants</h1>
+    <p class="muted">{{ restaurants|length }} menu{{ restaurants|length|pluralize }}</p>
+  </div>
+  <a class="btn btn--primary btn--lg" href="{% url 'editor:restaurant_new' %}">{% icon 'plus' %}<span>New restaurant</span></a>
+</div>
+
+{% if restaurants %}
+<ul class="cards">
+  {% for r in restaurants %}
+  <li class="rcard">
+    <a class="rcard__top" href="{% url 'editor:restaurant_edit' r.pk %}">
+      {% if r.logo %}<img class="rcard__logo" src="{{ r.logo.url }}" alt="" width="56" height="56">{% else %}<span class="rcard__logo rcard__logo--fallback" style="background: {{ r.brand_color }}">{{ r.name|slice:":1"|upper }}</span>{% endif %}
+      <span class="rcard__title">
+        <span class="rcard__name">{{ r.name }}</span>
+        <span class="rcard__meta">{{ r.item_count }} item{{ r.item_count|pluralize }} · updated {{ r.updated_at|timesince }} ago</span>
+      </span>
+      <span class="badge {% if r.is_published %}badge--live{% else %}badge--draft{% endif %}">{% if r.is_published %}Published{% else %}Draft{% endif %}</span>
+    </a>
+    <div class="rcard__actions">
+      <a class="btn btn--primary" href="{% url 'editor:restaurant_edit' r.pk %}">Edit menu</a>
+      <a class="btn" href="{{ r.public_path }}?preview=1" target="_blank" rel="noopener">{% icon 'external' %}<span>Preview</span></a>
+      <a class="btn" href="{% url 'printing:print_page' r.pk %}">{% icon 'printer' %}<span>Print / QR</span></a>
+      <button class="btn" type="button" data-copy="{{ r.public_url }}">{% icon 'link' %}<span>Copy link</span></button>
+      <a class="btn btn--ghost btn--icon" href="{% url 'editor:restaurant_settings' r.pk %}" title="Settings" aria-label="Settings for {{ r.name }}">{% icon 'sliders' %}</a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty">
+  <h2>No restaurant yet</h2>
+  <p>Create the first one: type its name, then add dishes straight from the paper menu.</p>
+  <a class="btn btn--primary btn--lg" href="{% url 'editor:restaurant_new' %}">{% icon 'plus' %}<span>New restaurant</span></a>
+</div>
+{% endif %}
+{% endblock %}

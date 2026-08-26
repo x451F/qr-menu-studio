@@ -1,0 +1,140 @@
+{% extends "editor/base.html" %}
+{% load static editor_tags %}
+{% block title %}Settings · {{ restaurant.name }}{% endblock %}
+{% block body_class %}page-edit page-settings{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<div class="editor editor--settings" data-page="settings" data-translate-url="{% url 'ai:translate' %}">
+  <div class="editor__col">
+    <div class="ed-head">
+      <div class="ed-head__title">
+        <a class="back back--icon" href="{% url 'editor:restaurant_edit' restaurant.pk %}" aria-label="Back to the menu">{% icon 'back' %}</a>
+        <h1 class="h1">Settings</h1>
+      </div>
+      {% include "editor/_publish_button.html" %}
+    </div>
+    <p class="muted small settings-note">Every change saves by itself{% if restaurant.is_published %} and is live for diners right away{% endif %}.</p>
+
+    <form id="settings-form" class="settings" hx-post="{% url 'editor:restaurant_settings' restaurant.pk %}" hx-trigger="change, input delay:700ms" hx-swap="none" data-single-field autocomplete="off" onsubmit="return false">
+      <section class="panel">
+        <h2 class="h3">Identity</h2>
+        {% include "editor/_logo_box.html" %}
+        <label class="field">
+          <span class="field__label">Restaurant name</span>
+          <input class="input" type="text" name="name" value="{{ restaurant.name }}" maxlength="120" autocomplete="off">
+          <span id="err-name" class="field-error" role="alert"></span>
+        </label>
+        {% include "editor/_tfield.html" with name="tagline" label="Tagline" value=restaurant.tagline key="tagline" placeholder="e.g. Cuisine de brasserie depuis 1987" side=True %}
+      </section>
+
+      <section class="panel">
+        <h2 class="h3">Look</h2>
+        <fieldset class="field">
+          <legend class="field__label">Theme</legend>
+          <div class="theme-cards">
+            {% for code, t in themes.items %}
+            <label class="theme-card" data-theme-card="{{ code }}">
+              <input type="radio" name="theme" value="{{ code }}"{% if code == restaurant.theme %} checked{% endif %}>
+              <span class="theme-card__mock theme-card__mock--{{ code }}" aria-hidden="true"><b>Aa</b><i></i><i></i><i></i></span>
+              <span class="theme-card__body"><strong>{{ t.label }}</strong><small>{{ t.hint }}</small></span>
+            </label>
+            {% endfor %}
+          </div>
+          <span id="err-theme" class="field-error" role="alert"></span>
+        </fieldset>
+
+        <div class="field">
+          <span class="field__label">Brand colour</span>
+          <div class="colorfield" data-colorfield>
+            <div class="swatches" role="group" aria-label="Brand colour presets">
+              {% for hex, label in brand_presets %}<button type="button" class="swatch" style="--c: {{ hex }}" data-color="{{ hex }}" title="{{ label }}" aria-label="{{ label }}"></button>{% endfor %}
+            </div>
+            <div class="colorfield__inputs">
+              <input type="color" class="colorpick" value="{{ restaurant.brand_color }}" aria-label="Pick the brand colour">
+              <input class="input input--hex" type="text" name="brand_color" value="{{ restaurant.brand_color }}" maxlength="7" autocomplete="off" spellcheck="false" aria-label="Brand colour, hex">
+            </div>
+          </div>
+          <span id="err-brand_color" class="field-error" role="alert"></span>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Accent colour <small class="muted">(optional)</small></span>
+          <div class="colorfield" data-colorfield>
+            <div class="swatches" role="group" aria-label="Accent colour presets">
+              <button type="button" class="swatch swatch--auto" data-color="" title="Automatic" aria-label="Automatic accent">Auto</button>
+              {% for hex, label in brand_presets %}<button type="button" class="swatch" style="--c: {{ hex }}" data-color="{{ hex }}" title="{{ label }}" aria-label="{{ label }}"></button>{% endfor %}
+            </div>
+            <div class="colorfield__inputs">
+              <input type="color" class="colorpick" value="{{ restaurant.accent_color|default:'#b8862b' }}" aria-label="Pick the accent colour">
+              <input class="input input--hex" type="text" name="accent_color" value="{{ restaurant.accent_color }}" maxlength="7" placeholder="Auto" autocomplete="off" spellcheck="false" aria-label="Accent colour, hex">
+            </div>
+          </div>
+          <span id="err-accent_color" class="field-error" role="alert"></span>
+        </div>
+
+        <fieldset class="field">
+          <legend class="field__label">Light or dark</legend>
+          <div class="seg seg--wide" role="radiogroup">
+            {% for code, label in color_modes.items %}
+            <label class="seg__opt"><input type="radio" name="color_mode" value="{{ code }}"{% if code == restaurant.color_mode %} checked{% endif %}><span>{{ label }}</span></label>
+            {% endfor %}
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="panel">
+        <h2 class="h3">Contact &amp; opening hours</h2>
+        <label class="field">
+          <span class="field__label">Address</span>
+          <textarea class="input" name="address" rows="2" placeholder="12 rue des Halles&#10;75001 Paris" autocomplete="off">{{ restaurant.address }}</textarea>
+        </label>
+        <label class="field">
+          <span class="field__label">Map link <small class="muted">(optional, by default built from the address)</small></span>
+          <input class="input" type="url" name="maps_url" value="{{ restaurant.maps_url }}" placeholder="https://maps.app.goo.gl/…" autocomplete="off" inputmode="url">
+          <span id="err-maps_url" class="field-error" role="alert"></span>
+        </label>
+        <label class="field">
+          <span class="field__label">Phone</span>
+          <input class="input" type="tel" name="phone" value="{{ restaurant.phone }}" placeholder="01 23 45 67 89" autocomplete="off" inputmode="tel">
+        </label>
+        {% include "editor/_tfield.html" with name="hours" label="Opening hours" value=restaurant.hours key="hours" placeholder="Mardi – Samedi : 12h – 14h, 19h – 22h" hint="One line per row, e.g. Mardi – Samedi : 12h – 14h, 19h – 22h (the part before ' : ' is the label)." multiline=True rows=4 side=True %}
+      </section>
+
+      <section class="panel">
+        <h2 class="h3">Languages &amp; footer</h2>
+        <label class="switch-row">
+          <input type="checkbox" name="english"{% if english_on %} checked{% endif %}>
+          <span class="switch" aria-hidden="true"></span>
+          <span>Offer an English version of the menu</span>
+        </label>
+        {% include "editor/_tfield.html" with name="footer_note" label="Footer note" value=restaurant.footer_note key="footer" placeholder="Prix nets, service compris." multiline=True side=True %}
+      </section>
+
+      <section class="panel">
+        <h2 class="h3">Web address</h2>
+        <div id="public-url-box">{% include "editor/_public_url.html" %}</div>
+        <label class="field">
+          <span class="field__label">Address ending</span>
+          <span class="slugfield"><span class="slugfield__prefix">/m/</span>
+            <input class="input" type="text" name="slug" value="{{ restaurant.slug }}" maxlength="80" autocomplete="off" autocapitalize="none" spellcheck="false"{% if slug_locked %} readonly aria-readonly="true"{% endif %}>
+            {% if slug_locked %}<span class="slugfield__lock">{% icon 'lock' %}</span>{% endif %}
+          </span>
+          <span id="err-slug" class="field-error" role="alert"></span>
+        </label>
+        {% if slug_locked %}
+        <p class="notice">{% icon 'lock' %}<span>This address is permanent. The menu has been published, so printed QR codes rely on it.</span></p>
+        {% else %}
+        <p class="notice notice--warn">{% icon 'alert' %}<span>Change it now if you want: <strong>once the menu is published this address can never change</strong>, because printed QR codes point to it.</span></p>
+        {% endif %}
+      </section>
+    </form>
+  </div>
+
+  {% include "editor/_preview.html" %}
+</div>
+
+<div class="bottombar">
+  <button type="button" class="btn btn--primary btn--lg bottombar__main" data-preview-open>{% icon 'phone' %}<span>Preview</span></button>
+  <a class="btn btn--lg" href="{% url 'editor:restaurant_edit' restaurant.pk %}"><span>Menu</span></a>
+</div>
+{% endblock %}

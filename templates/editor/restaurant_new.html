@@ -1,0 +1,37 @@
+{% extends "editor/base.html" %}
+{% load editor_tags %}
+{% block title %}New restaurant · QR Menu Studio{% endblock %}
+{% block content %}
+<div class="narrow">
+  <a class="back" href="{% url 'editor:dashboard' %}">{% icon 'back' %}<span>Restaurants</span></a>
+  <h1 class="h1">New restaurant</h1>
+  <p class="muted">Just a name to start. Everything else can be set later, and every change saves by itself.</p>
+
+  <form method="post" class="card stack" novalidate>
+    {% csrf_token %}
+    <label class="field">
+      <span class="field__label">Restaurant name</span>
+      <input class="input input--lg" type="text" name="name" value="{{ name }}" placeholder="Le Petit Bistrot" autocomplete="off" required autofocus maxlength="120">
+      {% if error %}<span class="field-error" role="alert">{{ error }}</span>{% endif %}
+    </label>
+
+    <fieldset class="field">
+      <legend class="field__label">Look (you can compare and change it live later)</legend>
+      <div class="theme-cards theme-cards--compact">
+        {% for code, t in themes.items %}
+        <label class="theme-card">
+          <input type="radio" name="theme" value="{{ code }}"{% if code == theme %} checked{% endif %}>
+          <span class="theme-card__body"><strong>{{ t.label }}</strong><small>{{ t.hint }}</small></span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <div class="actions-row">
+      <button class="btn btn--primary btn--lg" type="submit">Create and add dishes</button>
+      {% if AI_ENABLED %}<button class="btn btn--lg" type="submit" name="then" value="import">{% icon 'camera' %}<span>Start from a photo of the paper menu</span></button>{% endif %}
+    </div>
+  </form>
+
+</div>
+{% endblock %}

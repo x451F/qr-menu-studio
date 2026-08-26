@@ -1,0 +1,8 @@
+{% load editor_tags %}<div class="logo-box" id="logo-box">
+  <div class="logo-box__preview">{% if restaurant.logo %}<img src="{{ restaurant.logo.url }}" alt="Logo" width="72" height="72">{% else %}<span class="logo-box__empty" style="background: {{ restaurant.brand_color }}">{{ restaurant.name|slice:":1"|upper }}</span>{% endif %}</div>
+  <div class="logo-box__actions">
+    <label class="btn"><input type="file" name="logo" accept="image/*" class="visually-hidden" hx-post="{% url 'editor:restaurant_logo' restaurant.pk %}" hx-encoding="multipart/form-data" hx-trigger="change" hx-target="#logo-box" hx-swap="outerHTML" hx-include="this" hx-params="logo">{% icon 'upload' %}<span>{% if restaurant.logo %}Replace logo{% else %}Upload logo{% endif %}</span></label>
+    {% if restaurant.logo %}<button type="button" class="btn btn--ghost" hx-post="{% url 'editor:restaurant_logo' restaurant.pk %}" hx-vals='{"remove": "1"}' hx-target="#logo-box" hx-swap="outerHTML" hx-params="remove" hx-encoding="application/x-www-form-urlencoded">Remove</button>{% endif %}
+    {% if error %}<div class="field-error" role="alert">{{ error }}</div>{% endif %}
+  </div>
+</div>

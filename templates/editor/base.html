@@ -1,17 +1,40 @@
-{% load static %}<!doctype html>
+{% load static editor_tags %}<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#2f4f46">
 <title>{% block title %}QR Menu Studio{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'editor/editor.css' %}">
+<script src="{% static 'editor/vendor/htmx.min.js' %}" defer></script>
+<script src="{% static 'editor/editor.js' %}" defer></script>
 {% block extra_head %}{% endblock %}
 </head>
-<body>
-{# Base layout. Blocks: title, extra_head, content, extra_js. Optional context: restaurant. #}
-<header><a href="{% url 'editor:dashboard' %}">QR Menu Studio</a>{% if restaurant %} / <a href="{% url 'editor:restaurant_edit' restaurant.pk %}">{{ restaurant.name }}</a>{% endif %}</header>
-{% if messages %}<ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
-<main>{% block content %}{% endblock %}</main>
+<body class="{% block body_class %}{% endblock %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="{% url 'editor:dashboard' %}" aria-label="QR Menu Studio home">
+      <span class="brand__mark" aria-hidden="true"></span><span class="brand__name">QR Menu Studio</span>
+    </a>
+    {% if restaurant %}
+    <span class="crumb-sep" aria-hidden="true">/</span>
+    <a class="crumb" href="{% url 'editor:restaurant_edit' restaurant.pk %}">{{ restaurant.name }}</a>
+    {% endif %}
+    <span class="topbar__spacer"></span>
+    <span id="save-status" class="save-status" role="status" aria-live="polite" data-state="idle"><span class="save-status__dot"></span><span class="save-status__text"></span></span>
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'editor:logout' %}" class="topbar__logout">{% csrf_token %}
+      <button class="btn btn--ghost btn--icon" type="submit" title="Sign out" aria-label="Sign out">{% icon 'logout' %}</button>
+    </form>
+    {% endif %}
+  </div>
+</header>
+{% if messages %}
+<ul class="flash" role="status">{% for m in messages %}<li class="flash__item flash__item--{{ m.level_tag }}">{{ m }}</li>{% endfor %}</ul>
+{% endif %}
+<main class="main {% block main_class %}container{% endblock %}" id="main">{% block content %}{% endblock %}</main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

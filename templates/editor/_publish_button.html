@@ -1,0 +1,6 @@
+{% load editor_tags %}<button type="button" class="pubchip {% if restaurant.is_published %}is-live{% endif %}" hx-post="{% url 'editor:restaurant_publish' restaurant.pk %}" hx-swap="none"
+  hx-confirm="{% if restaurant.is_published %}Unpublish this menu? Diners who scan the QR code will see an error page until you publish again.{% elif restaurant.slug_is_locked %}Publish this menu again?{% else %}Publish this menu now? Its web address ({{ restaurant.public_path }}) becomes permanent, because printed QR codes will point to it. From then on, every saved edit is live.{% endif %}">
+  <span class="pubchip__dot" aria-hidden="true"></span>
+  <span class="pubchip__text">{% if restaurant.is_published %}Published{% else %}Draft{% endif %}</span>
+  <span class="pubchip__action">{% if restaurant.is_published %}Unpublish{% else %}Publish{% endif %}</span>
+</button>

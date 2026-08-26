@@ -1,0 +1,4 @@
+{% load editor_tags %}<div class="urlbox">
+  <a class="urlbox__url" href="{{ restaurant.public_path }}" target="_blank" rel="noopener">{{ restaurant.public_url }}</a>
+  <button type="button" class="btn btn--sm" data-copy="{{ restaurant.public_url }}">{% icon 'copy' %}<span>Copy</span></button>
+</div>
