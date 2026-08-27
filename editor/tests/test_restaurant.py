@@ -8,6 +8,8 @@ from menus.models import Restaurant
 
 from .conftest import HX, make_image
 
+HXS = {**HX, "HTTP_HX_CURRENT_URL": "http://testserver/admin/r/1/settings/"}
+
 
 def settings_url(r):
     return reverse("editor:restaurant_settings", args=[r.pk])
@@ -88,7 +90,7 @@ def test_settings_autosave_single_fields(client, restaurant):
 
 @pytest.mark.django_db
 def test_settings_validation_errors(client, restaurant):
-    resp = client.post(settings_url(restaurant), {"brand_color": "red", "maps_url": "nope", "name": ""}, **HX)
+    resp = client.post(settings_url(restaurant), {"brand_color": "red", "maps_url": "nope", "name": ""}, **HXS)
     body = resp.content.decode()
     assert "hex colour" in body
     assert "https://" in body
@@ -97,7 +99,7 @@ def test_settings_validation_errors(client, restaurant):
     assert restaurant.brand_color == "#7a2e2a"
     assert restaurant.name == "Chez Test"
     assert "validation" in json.loads(resp["HX-Trigger"])
-    resp = client.post(settings_url(restaurant), {"theme": "bogus"}, **HX)
+    resp = client.post(settings_url(restaurant), {"theme": "bogus"}, **HXS)
     restaurant.refresh_from_db()
     assert restaurant.theme == "bistro"
 
@@ -141,18 +143,18 @@ def test_logo_rejects_non_images(client, restaurant):
 
 @pytest.mark.django_db
 def test_slug_editable_until_published_then_locked(client, restaurant):
-    resp = client.post(settings_url(restaurant), {"slug": "Mon Menu Été"}, **HX)
+    resp = client.post(settings_url(restaurant), {"slug": "Mon Menu Été"}, **HXS)
     restaurant.refresh_from_db()
     assert restaurant.slug == "mon-menu-ete"
     assert b"permanent" not in resp.content
 
-    client.post(reverse("editor:restaurant_publish", args=[restaurant.pk]), **HX)
+    client.post(reverse("editor:restaurant_publish", args=[restaurant.pk]), **HXS)
     restaurant.refresh_from_db()
     assert restaurant.is_published
     assert restaurant.first_published_at is not None
     assert restaurant.slug_is_locked()
 
-    resp = client.post(settings_url(restaurant), {"slug": "other"}, **HX)
+    resp = client.post(settings_url(restaurant), {"slug": "other"}, **HXS)
     restaurant.refresh_from_db()
     assert restaurant.slug == "mon-menu-ete"
     assert b"permanent" in resp.content
@@ -164,7 +166,7 @@ def test_slug_editable_until_published_then_locked(client, restaurant):
 @pytest.mark.django_db
 def test_slug_uniqueness(client, restaurant):
     Restaurant.objects.create(name="Other", slug="taken")
-    resp = client.post(settings_url(restaurant), {"slug": "taken"}, **HX)
+    resp = client.post(settings_url(restaurant), {"slug": "taken"}, **HXS)
     restaurant.refresh_from_db()
     assert restaurant.slug != "taken"
     assert b"already used" in resp.content

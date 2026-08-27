@@ -139,7 +139,8 @@ def category_add(request, pk):
     html = render_to_string(
         "editor/_category.html", base_ctx(restaurant, category=category), request
     )
-    html += '<div id="empty-state" hx-swap-oob="delete"></div>'
+    if restaurant.categories.count() == 1:
+        html += '<div id="empty-state" hx-swap-oob="delete"></div>'
     html += '<div id="cat-add-error" hx-swap-oob="innerHTML"></div>'
     return HttpResponse(html)
 
@@ -426,7 +427,8 @@ def special_add(request, pk, kind):
     html = render_to_string(
         "editor/_special.html", special_context(special, restaurant, open=True), request
     )
-    html += '<div id="specials-empty" hx-swap-oob="delete"></div>'
+    if restaurant.specials.count() == 1:
+        html += '<div id="specials-empty" hx-swap-oob="delete"></div>'
     return HttpResponse(html)
 
 

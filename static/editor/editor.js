@@ -570,6 +570,7 @@
       }).catch(function () {});
     }
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
-  else boot();
+  // Deferred scripts run while readyState is "interactive": wait for DOMContentLoaded so every deferred vendor script is ready.
+  if (document.readyState === "complete") boot();
+  else document.addEventListener("DOMContentLoaded", boot);
 })();

@@ -175,18 +175,20 @@ def _save_settings(request, restaurant: Restaurant):
                 restaurant.slug = slug
 
     restaurant.save()
-    parts = [
-        f'<div id="err-{key}" class="field-error" role="alert" hx-swap-oob="true">{escape(msg)}</div>'
-        for key, msg in errors.items()
-    ]
-    for key in data:
-        if key not in errors and key != "csrfmiddlewaretoken":
-            parts.append(f'<div id="err-{key}" class="field-error" hx-swap-oob="true"></div>')
-    parts.append(
-        '<div id="public-url-box" hx-swap-oob="innerHTML">'
-        + render_public_url(request, restaurant)
-        + "</div>"
-    )
+    parts = []
+    if "/settings/" in request.headers.get("HX-Current-URL", ""):
+        parts = [
+            f'<div id="err-{key}" class="field-error" role="alert" hx-swap-oob="true">{escape(msg)}</div>'
+            for key, msg in errors.items()
+        ]
+        for key in data:
+            if key not in errors and key != "csrfmiddlewaretoken":
+                parts.append(f'<div id="err-{key}" class="field-error" hx-swap-oob="true"></div>')
+        parts.append(
+            '<div id="public-url-box" hx-swap-oob="innerHTML">'
+            + render_public_url(request, restaurant)
+            + "</div>"
+        )
     response = HttpResponse("".join(parts))
     trigger = {
         "settingsSaved": {
