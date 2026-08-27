@@ -74,3 +74,12 @@ def allergen_options(item):
 @register.filter
 def diet_options(item):
     return services.diet_options(item)
+
+
+@register.filter
+def ago(value):
+    """'4 hours, 17 minutes' -> '4 hours ago' (largest unit only)."""
+    from django.utils.timesince import timesince
+
+    text = timesince(value).replace("\u00a0", " ").split(",")[0]
+    return "just now" if text.startswith("0 minute") else f"{text} ago"

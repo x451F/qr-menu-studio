@@ -188,11 +188,11 @@ select.input { appearance: none; padding-right: 36px; background: var(--surface)
 .rcard__title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .rcard__name { font-weight: 700; font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rcard__meta { color: var(--muted); font-size: 14px; }
-.rcard__actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 16px; }
-.rcard__actions .btn--primary { flex: 1 1 100%; }
-.rcard__actions .btn { flex: 1 1 auto; }
-.rcard__actions .btn--icon { flex: none; }
-@media (min-width: 420px) { .rcard__actions .btn--primary { flex: 1 1 auto; } }
+.rcard__actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 16px 16px; }
+.rcard__edit { grid-column: span 2; }
+.tile { flex-direction: column; gap: 4px; min-height: 58px; padding: 6px 4px; font-size: 13px; }
+.rcard__settings span { display: inline; }
+@media (max-width: 380px) { .rcard__settings span { display: none; } }
 .badge { padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; flex: none; }
 .badge--live { background: var(--ok-soft); color: var(--ok); }
 .badge--draft { background: #eeece4; color: var(--muted); }
@@ -454,9 +454,11 @@ body.page-edit { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 .preview__title { display: flex; align-items: center; gap: 10px; }
 .preview__title strong { font-size: 15px; }
 .preview__hint { display: none; flex: 1; font-size: 12px; color: var(--muted); }
-.preview__title .preview__close { margin-left: auto; }
+.preview__title .preview__close { margin-left: 0; }
+.preview__title [data-use-theme] { margin-left: auto; }
 .preview__opts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .preview .chip { min-height: 40px; }
+@media (min-width: 1024px) { .preview .chip { min-height: 36px; padding: 0 11px; font-size: 13px; } .preview .chips { gap: 6px; } }
 .phone { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: stretch; }
 .phone__screen { width: 100%; height: 100%; background: #fff; }
 .phone__frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
@@ -489,3 +491,4 @@ body.page-edit { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 .chip__ic:not(:has(use)) { display: none; }
+.brand__mark { display: inline-block; }

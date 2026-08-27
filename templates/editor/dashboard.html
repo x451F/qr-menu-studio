@@ -18,16 +18,16 @@
       {% if r.logo %}<img class="rcard__logo" src="{{ r.logo.url }}" alt="" width="56" height="56">{% else %}<span class="rcard__logo rcard__logo--fallback" style="background: {{ r.brand_color }}">{{ r.name|slice:":1"|upper }}</span>{% endif %}
       <span class="rcard__title">
         <span class="rcard__name">{{ r.name }}</span>
-        <span class="rcard__meta">{{ r.item_count }} item{{ r.item_count|pluralize }} · updated {{ r.updated_at|timesince }} ago</span>
+        <span class="rcard__meta">{{ r.item_count }} item{{ r.item_count|pluralize }} · updated {{ r.updated_at|ago }}</span>
       </span>
       <span class="badge {% if r.is_published %}badge--live{% else %}badge--draft{% endif %}">{% if r.is_published %}Published{% else %}Draft{% endif %}</span>
     </a>
     <div class="rcard__actions">
-      <a class="btn btn--primary" href="{% url 'editor:restaurant_edit' r.pk %}">Edit menu</a>
-      <a class="btn" href="{{ r.public_path }}?preview=1" target="_blank" rel="noopener">{% icon 'external' %}<span>Preview</span></a>
-      <a class="btn" href="{% url 'printing:print_page' r.pk %}">{% icon 'printer' %}<span>Print / QR</span></a>
-      <button class="btn" type="button" data-copy="{{ r.public_url }}">{% icon 'link' %}<span>Copy link</span></button>
-      <a class="btn btn--ghost btn--icon" href="{% url 'editor:restaurant_settings' r.pk %}" title="Settings" aria-label="Settings for {{ r.name }}">{% icon 'sliders' %}</a>
+      <a class="btn btn--primary rcard__edit" href="{% url 'editor:restaurant_edit' r.pk %}">Edit menu</a>
+      <a class="btn rcard__settings" href="{% url 'editor:restaurant_settings' r.pk %}" aria-label="Settings for {{ r.name }}">{% icon 'sliders' %}<span>Settings</span></a>
+      <a class="btn tile" href="{{ r.public_path }}?preview=1" target="_blank" rel="noopener">{% icon 'external' %}<span>Preview</span></a>
+      <a class="btn tile" href="{% url 'printing:print_page' r.pk %}">{% icon 'printer' %}<span>Print / QR</span></a>
+      <button class="btn tile" type="button" data-copy="{{ r.public_url }}">{% icon 'link' %}<span>Copy link</span></button>
     </div>
   </li>
   {% endfor %}

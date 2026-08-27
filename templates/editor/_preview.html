@@ -3,6 +3,7 @@
     <div class="preview__title">
       <strong>Live preview</strong>
       <span class="preview__hint">Try a look, nothing is saved until you tap “Use this theme”.</span>
+      <button type="button" class="btn btn--sm btn--primary" data-use-theme hidden>Use this theme</button>
       <button type="button" class="btn btn--ghost btn--icon preview__close" data-preview-close aria-label="Close preview">{% icon 'x' %}</button>
     </div>
     <div class="chips chips--scroll" role="group" aria-label="Theme">
@@ -14,7 +15,6 @@
         <button type="button" class="seg__btn{% if restaurant.color_mode == 'dark' %} is-active{% endif %}" data-mode="dark" aria-pressed="{% if restaurant.color_mode == 'dark' %}true{% else %}false{% endif %}">Dark</button>
       </div>
       <label class="check"><input type="checkbox" data-photos checked><span>Photos</span></label>
-      <button type="button" class="btn btn--sm btn--primary" data-use-theme hidden>Use this theme</button>
     </div>
   </div>
   <div class="phone">
