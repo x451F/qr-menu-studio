@@ -69,8 +69,9 @@ def price_feedback(data, errors):
     if errors:
         rows = [i for i, _ in errors]
         raw = errors[0][1]
-        events["priceError"] = {"rows": rows}
-        events["validation"] = {"message": f"“{raw}” isn't a valid price. Try 12,50"}
+        message = f"“{raw}” isn't a valid price. Try 12,50"
+        events["priceError"] = {"rows": rows, "message": message}
+        events["validation"] = {"message": message}
     return events
 
 
