@@ -1,0 +1,50 @@
+/* bistro: the brasserie carte. Paper, double rules, dotted leaders, burgundy. */
+:root{
+  --font-display:"Fraunces","Fraunces Fallback",Georgia,serif;
+  --font-body:"Instrument Sans","Instrument Sans Fallback",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ff-name:var(--font-body);--ff-price:var(--font-body);
+  --h1:clamp(2.125rem,9vw,2.875rem);--h2:1.65rem;--fs-name:1.1875rem;--fs-price:1.125rem;
+  --w-name:600;--w-price:600;--w-h:600;
+  --radius:2px;--radius-sm:2px;--chip-r:2px;--thumb-r:2px;--density:1;--ta:center;--ai:center;
+}
+.head{padding-bottom:var(--s5)}
+.head::after{content:"";display:block;margin-top:var(--s5);height:6px;border-block:1px solid var(--brand-ui);border-top-width:2px}
+.name{letter-spacing:-.01em}
+.tagline{font-style:normal;letter-spacing:.02em}
+.eyebrow{color:var(--accent-text)}
+.today-card{border:1px solid var(--ink);outline:1px solid var(--ink);outline-offset:-7px;padding:var(--s6) var(--s5);background:var(--surface);text-align:center}
+.today-card .eyebrow{display:block;margin-bottom:var(--s1)}
+.sp{padding-top:var(--s3)}
+.sp+.sp{border-top:1px dotted var(--ink-2)}
+.sp-row{flex-direction:column;align-items:center;gap:var(--s1)}
+.sp-title{font:600 1.375rem/1.2 var(--font-display)}
+.sp-row .dish-prices{max-width:none}
+.sp-row .pr{justify-content:center}
+.sp-desc{margin-inline:auto;max-width:28rem}
+.cat-head{margin-top:0;padding-block:var(--s3);border-top:3px double var(--brand-ui);border-bottom:1px solid var(--line-strong);text-align:center}
+.cat-head h2{font-variant-caps:all-small-caps;letter-spacing:.07em;font-size:1.85rem}
+.cat-desc{margin-inline:auto;font-size:1rem}
+.dish{border-bottom:1px dotted var(--line-strong)}
+.dish:last-child{border-bottom:0}
+.dish-prices{color:var(--brand-text)}
+.dish-head:has(.lead){align-items:baseline}
+.dish-head:has(.lead) .dish-name{flex:0 1 auto}
+.lead{display:block;flex:1 1 1.25rem;min-width:1.25rem;align-self:flex-end;margin-bottom:.4em;border-bottom:2px dotted var(--ink-2);opacity:.5}
+@supports (align-items:last baseline){.dish-head:has(.lead){align-items:last baseline}.dish-head:has(.lead) .lead{align-self:auto;margin-bottom:0;position:relative;top:-.3em}}
+.dish-head .dish-prices:has(.pr+.pr){align-self:flex-start}
+[data-sold] .dish-prices{color:var(--ink-2)}
+.bar a{border-radius:2px;font-weight:600}
+.bar a[aria-current]{box-shadow:0 2px 0 0 var(--accent-ui)}
+.dish-thumb{padding:3px;background:var(--surface);border:1px solid var(--line-strong)}
+.dish-tags{margin-top:var(--s2)}
+.legend,.hours h2{}
+.foot{border-top:3px double var(--brand-ui)}
+.foot .contact,.hours,.note{text-align:left}
+@media (min-width:1024px){
+  .cat-head{text-align:left}
+  .cat-desc{margin-inline:0}
+  .head{padding-bottom:var(--s5)}
+  .head .lang{position:absolute;right:0}
+  .head{position:relative}
+}
+@media (prefers-reduced-motion:no-preference){.bar a[aria-current]{transition:box-shadow .15s}}
