@@ -1,14 +1,74 @@
-{% load menu_tags %}<!doctype html>
-<html lang="{{ lang }}">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ menu.name }}</title></head>
+{% load static public_tags %}{% photo_mode menu as pmode %}{% density menu as dens %}<!doctype html>
+<html lang="{{ lang }}" data-theme="{{ menu.theme }}" data-mode="{{ menu.color_mode }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ menu.name }}{% if menu.tagline %} · {{ menu.tagline }}{% endif %}</title>
+<meta name="description" content="{% if menu.tagline %}{{ menu.tagline }}{% else %}{{ menu.name }}{% endif %}">
+<meta name="color-scheme" content="{% if menu.color_mode == 'light' %}light{% elif menu.color_mode == 'dark' %}dark{% else %}light dark{% endif %}">
+{% if menu.color_mode == 'auto' %}<meta name="theme-color" content="{{ theme_vars.light|var:'--bg' }}" media="(prefers-color-scheme: light)"><meta name="theme-color" content="{{ theme_vars.dark|var:'--bg' }}" media="(prefers-color-scheme: dark)">{% else %}<meta name="theme-color" content="{% if menu.color_mode == 'dark' %}{{ theme_vars.dark|var:'--bg' }}{% else %}{{ theme_vars.light|var:'--bg' }}{% endif %}">{% endif %}
+{% if menu.preview %}<meta name="robots" content="noindex, nofollow">{% endif %}
+<meta property="og:type" content="restaurant.menu"><meta property="og:title" content="{{ menu.name }}">{% if menu.tagline %}<meta property="og:description" content="{{ menu.tagline }}">{% endif %}{% if menu.logo_url %}<meta property="og:image" content="{{ menu.logo_url }}">{% endif %}
+{% for l in menu.languages %}{% if not l.active %}<link rel="alternate" hreflang="{{ l.code }}" href="{{ l.url }}">{% endif %}{% endfor %}
+{% font_preloads menu.theme %}
+<style>{% font_css menu.theme %}{% theme_vars_css theme_vars %}{% inline_css menu.theme %}</style>
+<noscript><style>.dish-desc{display:block;-webkit-line-clamp:unset;line-clamp:unset}</style></noscript>
+<script src="{% static 'public/js/menu.js' %}" defer></script>
+</head>
 <body>
-{# Placeholder until the themed template lands. #}
-<h1>{{ menu.name }}</h1>
-{% for l in menu.languages %}<a href="{{ l.url }}">{{ l.short }}</a> {% endfor %}
-{% for sp in menu.specials %}<p><strong>{{ sp.kind_label }}</strong> {{ sp.title }} {% for p in sp.prices %}{{ p.label }} {{ p.amount }} {% endfor %}</p>{% endfor %}
-{% for cat in menu.categories %}<section id="{{ cat.anchor }}"><h2>{{ cat.name }}</h2>
-{% for it in cat.items %}<article id="{{ it.anchor }}"><h3>{{ it.name }}</h3><p>{{ it.description }}</p>
-<p>{% for p in it.prices %}{{ p.label }} {{ p.amount }}{% if not forloop.last %} / {% endif %}{% endfor %}</p>
-{% if it.sold_out %}<p>{{ s.sold_out }}</p>{% endif %}</article>{% endfor %}</section>{% endfor %}
-</body></html>
+{% icon_sprite menu %}
+<a class="skip" href="#menu">{{ s.skip }}</a>
+<div class="page" data-photos="{{ pmode }}" data-count="{{ dens }}">
+<header class="head">
+{% if menu.languages %}<div class="lang" role="group" aria-label="{{ s.language }}">{% for l in menu.languages %}<a href="{{ l.url }}" hreflang="{{ l.code }}" lang="{{ l.code }}" title="{{ l.label }}"{% if l.active %} aria-current="true"{% endif %}>{{ l.short }}</a>{% endfor %}</div>{% endif %}
+<div class="id">{% if menu.logo_url %}<img class="logo" src="{{ menu.logo_url }}" alt="">{% endif %}
+<h1 class="name">{{ menu.name }}</h1>
+{% if menu.tagline %}<p class="tagline">{{ menu.tagline }}</p>{% endif %}</div>
+</header>
+{% if menu.specials %}<section class="today" aria-labelledby="today-h"><div class="today-card">
+<h2 class="eyebrow" id="today-h">{{ s.today }}</h2>
+<ul class="specials">{% for sp in menu.specials %}<li class="sp" data-kind="{{ sp.kind }}"><p class="sp-kind">{{ sp.kind_label }}</p><div class="sp-row"><h3 class="sp-title">{{ sp.title }}</h3>{% if sp.prices %}<div class="dish-prices">{% include "public/_prices.html" with prices=sp.prices %}</div>{% endif %}</div>{% if sp.description %}<p class="sp-desc">{{ sp.description }}</p>{% endif %}</li>{% endfor %}</ul>
+</div></section>{% endif %}
+{% if menu.categories|length > 1 or menu.item_count >= 20 %}<nav class="bar" aria-label="{{ s.categories }}">
+<ul>{% for cat in menu.categories %}<li><a href="#{{ cat.anchor }}">{{ cat.name }}</a></li>{% endfor %}</ul>
+{% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<button type="button" class="fbtn" id="fbtn" hidden><svg class="ic" aria-hidden="true"><use href="#ui-sliders"/></svg><span>{{ s.filter }}</span></button>{% endif %}
+<p class="fstat" id="fstat" hidden aria-live="polite" data-n="{{ s.hidden_n }}" data-one="{{ s.hidden_1 }}"><span></span> <button type="button" id="freset">{{ s.reset }}</button></p>
+</nav>{% endif %}
+<main id="menu" tabindex="-1">
+{% for cat in menu.categories %}<section class="cat" id="{{ cat.anchor }}" aria-labelledby="h-{{ cat.anchor }}">
+<header class="cat-head"><h2 id="h-{{ cat.anchor }}">{{ cat.name }}</h2>{% if cat.description %}<p class="cat-desc">{{ cat.description }}</p>{% endif %}</header>
+<ul class="dishes">{% for it in cat.items %}{% include "public/_dish.html" with first_cat=forloop.parentloop.first %}{% endfor %}</ul>
+</section>{% endfor %}
+<p class="noresults" id="noresults" hidden>{{ s.no_results }}</p>
+</main>
+{% if menu.legend_allergens or menu.legend_diets %}<section class="legend" id="legend" aria-labelledby="legend-h"><h2 id="legend-h">{{ s.legend_title }}</h2>
+<ul>{% for t in menu.legend_diets %}<li><svg class="ic diet" aria-hidden="true"><use href="#diet-{{ t.code }}"/></svg>{{ t.label }}</li>{% endfor %}{% for t in menu.legend_allergens %}<li><svg class="ic" aria-hidden="true"><use href="#al-{{ t.code }}"/></svg>{{ t.label }}</li>{% endfor %}</ul></section>{% endif %}
+<footer class="foot">
+{% if menu.address or menu.phone %}<div class="contact">
+{% if menu.address %}<address><a href="{{ menu.maps_url }}" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#ui-pin"/></svg><span>{{ menu.address|linebreaksbr }}<small>{{ s.directions }}</small></span></a></address>{% endif %}
+{% if menu.phone and menu.phone_href %}<a class="tel" href="{{ menu.phone_href }}"><svg class="ic" aria-hidden="true"><use href="#ui-phone"/></svg><span>{{ menu.phone }}<small>{{ s.call }}</small></span></a>{% endif %}
+</div>{% endif %}
+{% if menu.hours %}<section class="hours" aria-labelledby="hours-h"><h2 id="hours-h"><svg class="ic" aria-hidden="true"><use href="#ui-clock"/></svg>{{ s.hours }}</h2><dl>{% for line in menu.hours %}{% with p=line|hours_parts %}{% if p.0 %}<div><dt>{{ p.0 }}</dt><dd>{{ p.1 }}</dd></div>{% else %}<div class="full"><dd>{{ p.1 }}</dd></div>{% endif %}{% endwith %}{% endfor %}</dl></section>{% endif %}
+{% if menu.footer_note %}<p class="note">{{ menu.footer_note }}</p>{% endif %}
+</footer>
+</div>
+<dialog class="sheet" id="sheet" aria-labelledby="s-name"><div class="sheet-in">
+<button type="button" class="x" data-close aria-label="{{ s.close }}"><svg class="ic" aria-hidden="true"><use href="#ui-close"/></svg></button>
+<div class="sheet-body"><div class="grip" aria-hidden="true"></div><div class="s-photo" id="s-photo"></div>
+<div class="s-main"><div class="dish-head"><h2 class="s-name" id="s-name"></h2><div class="dish-prices" id="s-prices"></div></div><p class="s-sold" id="s-sold" hidden></p>
+<p class="s-desc" id="s-desc"></p>
+<h3 class="s-h" id="s-dh" hidden>{{ s.diets }}</h3><ul class="s-tags" id="s-diets"></ul>
+<h3 class="s-h" id="s-ah" hidden>{{ s.allergens }}</h3><ul class="s-tags" id="s-al"></ul></div></div>
+</div></dialog>
+{% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<dialog class="sheet" id="filters" aria-labelledby="f-title"><div class="sheet-in">
+<button type="button" class="x" data-close aria-label="{{ s.close }}"><svg class="ic" aria-hidden="true"><use href="#ui-close"/></svg></button>
+<form class="sheet-body" id="fform" onsubmit="return false"><div class="grip" aria-hidden="true"></div>
+<h2 class="s-name" id="f-title">{{ s.filter_title }}</h2>
+{% if menu.item_count >= 20 %}<label class="search"><span class="sr">{{ s.search }}</span><svg class="ic" aria-hidden="true"><use href="#ui-search"/></svg><input type="search" id="fq" placeholder="{{ s.search }}" autocomplete="off" enterkeyhint="search"></label>{% endif %}
+{% if menu.legend_diets %}<fieldset class="chk"><legend class="s-h">{{ s.diet_only }}</legend><div class="dchips">{% for t in menu.legend_diets %}<label class="dchip"><input type="checkbox" name="diet" value="{{ t.code }}"><svg class="ic" aria-hidden="true"><use href="#diet-{{ t.code }}"/></svg><span>{{ t.label }}</span></label>{% endfor %}</div></fieldset>{% endif %}
+{% if menu.legend_allergens %}<fieldset class="chk"><legend class="s-h">{{ s.hide_containing }}</legend><div class="alist">{% for t in menu.legend_allergens %}<label class="arow"><input type="checkbox" name="al" value="{{ t.code }}"><svg class="ic" aria-hidden="true"><use href="#al-{{ t.code }}"/></svg><span>{{ t.label }}</span></label>{% endfor %}</div></fieldset>{% endif %}
+<p class="fnote">{{ s.filter_note }}</p>
+<div class="factions"><button type="button" class="link" id="freset2">{{ s.reset }}</button><button type="button" class="cta" id="fshow" data-n="{{ s.show_n }}" data-one="{{ s.show_1 }}" data-none="{{ s.no_results }}"></button></div>
+</form></div></dialog>{% endif %}
+</body>
+</html>
