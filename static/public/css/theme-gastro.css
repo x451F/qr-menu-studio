@@ -1,0 +1,51 @@
+/* gastro: tasting-menu card. Typographic silence. */
+:root{
+  --font-display:"Cormorant Garamond","Cormorant Garamond Fallback",Georgia,serif;
+  --font-body:"Jost","Jost Fallback",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ff-name:var(--font-display);--ff-price:var(--font-body);
+  --h1:clamp(2.5rem,10vw,3.75rem);--h2:2.125rem;--fs-name:1.4375rem;--fs-desc:1rem;--fs-price:1rem;
+  --w-name:500;--w-price:500;--w-h:500;
+  --radius:0;--radius-sm:0;--chip-r:0;--thumb-r:0;--density:1.5;--ta:center;--ai:center;--thumb:96px;
+}
+@media (min-width:720px){:root{--thumb:120px}}
+.head{padding-block:var(--s2) var(--s6)}
+.name{letter-spacing:.02em;line-height:1}
+.name::after{content:"";display:block;width:40px;height:1px;margin:var(--s5) auto 0;background:var(--brand-ui)}
+.tagline{margin-top:var(--s4);font-size:.9375rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.lang a{font-weight:500}
+.today-card{border:0;border-block:1px solid var(--line-strong);border-radius:0;background:none;text-align:center;padding:var(--s5) 0}
+.eyebrow{font-weight:500;letter-spacing:.2em;color:var(--brand-text)}
+.eyebrow::before,.eyebrow::after{content:"·";margin-inline:.6em}
+.sp-kind{font:italic 500 1.125rem/1.2 var(--font-display);color:var(--ink-2)}
+.sp-row{flex-direction:column;align-items:center;gap:var(--s1)}
+.sp-title{font:italic 500 1.875rem/1.1 var(--font-display)}
+.sp-row .dish-prices{max-width:none}.sp-row .pr{justify-content:center}
+.sp-desc{margin-inline:auto;max-width:26rem}
+.sp+.sp{border-top:0;padding-top:var(--s5)}
+.dish{border-bottom:0}
+.dish-name{letter-spacing:.005em;line-height:1.15}
+.dish-desc{line-height:1.6;max-width:30rem}
+.dish-prices{color:var(--ink);letter-spacing:.03em;padding-top:.35em}
+.pl{letter-spacing:.06em;text-transform:uppercase;font-size:.75rem}
+.cat{padding-top:var(--s7)}
+.cat-head{text-align:center;margin-bottom:var(--s5)}
+.cat-head h2{font-style:italic}
+.cat-head::before{content:"";display:block;width:24px;height:1px;background:var(--line-strong);margin:0 auto var(--s4)}
+.cat-desc{margin-inline:auto;font-size:.9375rem;letter-spacing:.04em}
+.bar a{border:0;padding:0 var(--s3);font-weight:500;font-size:.8125rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);border-bottom:1px solid transparent;border-radius:0;background:none}
+.bar a[aria-current]{background:none;color:var(--ink);border-bottom-color:var(--ink)}
+.bar ul{gap:var(--s1)}
+.fbtn{border:0;background:none;font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:.8125rem}
+.legend,.foot{text-align:center}
+.legend ul{justify-items:start}
+.foot .contact{justify-items:center}
+.hours dl,.note{margin-inline:auto}
+.hours h2{justify-content:center}
+@media (min-width:1024px){
+  .bar a{border-bottom:0;border-left:1px solid transparent;padding-left:var(--s4)}
+  .bar a[aria-current]{border-left-color:var(--ink)}
+  .legend,.foot{text-align:left}
+  .hours h2{justify-content:flex-start}
+  .hours dl,.note{margin-inline:0}
+  .foot .contact{justify-items:start}
+}

@@ -1,0 +1,39 @@
+/* auberge: farmhouse kraft. Stitched paper cards, sprigs, tilted prints. */
+:root{
+  --font-display:"Alegreya","Alegreya Fallback",Georgia,serif;
+  --font-body:"Alegreya Sans","Alegreya Sans Fallback",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ff-name:var(--font-display);--ff-price:var(--font-body);
+  --h1:clamp(2.375rem,10vw,3.5rem);--h2:1.875rem;--fs-name:1.3125rem;--fs-desc:1.0625rem;--fs-price:1.1875rem;
+  --w-name:700;--w-price:700;--w-h:700;
+  --radius:8px;--radius-sm:6px;--chip-r:8px;--thumb-r:2px;--density:1.05;--ta:center;--ai:center;
+  --sprig:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 16'%3E%3Cpath d='M16 15V3M16 12q-6 0-8-6 6 0 8 6zM16 12q6 0 8-6-6 0-8 6zM16 7q-4 0-5-4 4 0 5 4zM16 7q4 0 5-4-4 0-5 4z' fill='%23000' stroke='%23000' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+body{font-size:1.0625rem}
+.head{padding-block:var(--s2) var(--s6)}
+.name::before{content:"";display:block;width:40px;height:20px;margin:0 auto var(--s3);background:var(--brand-ui);-webkit-mask:var(--sprig) center/contain no-repeat;mask:var(--sprig) center/contain no-repeat}
+.tagline{font-style:italic;font-size:1.1875rem}
+.today-card{position:relative;border:3px solid var(--accent-ui);border-radius:var(--radius);padding:var(--s5);background:var(--surface);text-align:center;outline:1px solid var(--line-strong);outline-offset:-9px}
+.eyebrow{font-family:var(--font-body);font-weight:700}
+.sp-row{flex-direction:column;align-items:center}.sp-row .dish-prices{max-width:none}.sp-row .pr{justify-content:center}
+.sp-title{font:700 1.5rem/1.15 var(--font-display)}
+.sp-kind{color:var(--ink-2);font-style:italic}
+.sp-desc{margin-inline:auto;max-width:28rem}
+.cat-head h2{display:flex;align-items:center;gap:var(--s3)}
+.cat-head h2::after{content:"";flex:1;height:1px;background:var(--line-strong)}
+.cat-head::before{content:"";display:block;width:32px;height:16px;margin-bottom:var(--s2);background:var(--brand-ui);-webkit-mask:var(--sprig) 0 0/contain no-repeat;mask:var(--sprig) 0 0/contain no-repeat}
+.dish{background:var(--surface);border-radius:var(--radius-sm);border:0;margin-bottom:var(--s2);padding:calc(var(--s3) * var(--density)) var(--s4);outline:1.5px dashed var(--line-strong);outline-offset:-6px}
+.dish-prices{color:var(--brand-text)}
+[data-sold] .dish-prices{color:var(--ink-2)}
+.dish-link::after{border-radius:var(--radius-sm)}
+.dish-desc{line-height:1.45}
+.dish-thumb{padding:3px;background:var(--bg);border:1px solid var(--line-strong);transform:rotate(-1.2deg)}
+.dish:nth-child(even) .dish-thumb{transform:rotate(1.2deg)}
+[data-sold] .dish-thumb{transform:none}
+.bar a{border:1.5px dashed var(--line-strong);background:var(--surface);font-family:var(--font-body);font-weight:700;font-size:1rem}
+.bar a[aria-current]{border-style:solid}
+.legend h2,.hours h2{font-family:var(--font-body)}
+@media (min-width:720px){.today-card{transform:rotate(-.5deg)}}
+@media (min-width:1024px){
+  .bar a{border:0;border-left:2px solid transparent;background:none}
+  .bar a[aria-current]{background:none;border-left-color:var(--brand-ui)}
+}
