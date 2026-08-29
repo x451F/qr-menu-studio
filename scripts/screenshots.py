@@ -51,8 +51,22 @@ def new_ctx(browser, width, dark=None):
     )
 
 
+def settle(pg):
+    """Scroll through the page so lazy images load, then return to the top."""
+    h = pg.evaluate("document.documentElement.scrollHeight")
+    y = 0
+    while y < h:
+        pg.evaluate(f"window.scrollTo(0,{y})")
+        pg.wait_for_timeout(60)
+        y += 700
+    pg.evaluate("window.scrollTo(0,0)")
+    pg.wait_for_timeout(500)
+
+
 def save(pg, path: Path, full=False, fmt="png"):
     path.parent.mkdir(parents=True, exist_ok=True)
+    if full:
+        settle(pg)
     if fmt == "png":
         pg.screenshot(path=str(path), full_page=full)
     else:
