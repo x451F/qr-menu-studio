@@ -7,7 +7,8 @@
   --w-name:700;--w-price:700;--w-h:700;
   --radius:28px;--radius-sm:12px;--chip-r:999px;--thumb-r:50%;--density:1.05;
 }
-.page>.head{padding-bottom:var(--s7);background:var(--brand-soft);border-radius:0 0 40px 40px}
+.page>.head{padding-bottom:var(--s5);background:var(--brand-soft);border-radius:0 0 40px 40px}
+.head:has(+ .today){padding-bottom:var(--s7)}
 .name{letter-spacing:-.025em}
 .tagline{color:var(--ink);font-weight:600}
 .lang a{background:color-mix(in srgb,var(--surface) 70%,transparent)}

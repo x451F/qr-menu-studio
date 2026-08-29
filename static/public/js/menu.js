@@ -95,7 +95,7 @@
     ph.textContent = '';
     if (img) {
       const i = new Image();
-      i.alt = ''; i.width = img.width; i.height = img.height;
+      i.alt = '';
       if (img.dataset.fullset) { i.srcset = img.dataset.fullset; i.sizes = '(min-width:720px) 576px, 100vw'; }
       i.src = img.dataset.full;
       ph.append(i);

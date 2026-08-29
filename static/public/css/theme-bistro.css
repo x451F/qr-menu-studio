@@ -24,6 +24,7 @@
 .cat-head{margin-top:0;padding-block:var(--s3);border-top:3px double var(--brand-ui);border-bottom:1px solid var(--line-strong);text-align:center}
 .cat-head h2{font-variant-caps:all-small-caps;letter-spacing:.07em;font-size:1.85rem}
 .cat-desc{margin-inline:auto;font-size:1rem}
+:not(.bar)+main .cat:first-child .cat-head{border-top:0;padding-top:0}
 .dish{border-bottom:1px dotted var(--line-strong)}
 .dish:last-child{border-bottom:0}
 .dish-prices{color:var(--brand-text)}
