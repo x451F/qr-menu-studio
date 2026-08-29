@@ -1,0 +1,127 @@
+{% extends "editor/base.html" %}
+{% load static %}
+{% block title %}Print &amp; QR — {{ restaurant.name }}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'printing/print.css' %}">{% endblock %}
+
+{% block content %}
+<div class="pr-page" data-pr-root>
+  <h1 class="pr-h1">Print &amp; QR codes <span class="pr-muted">· {{ restaurant.name }}</span></h1>
+
+  {% if not restaurant.is_published %}
+  <div class="pr-banner pr-banner--warn" role="alert">
+    <strong>This menu is not published yet.</strong>
+    The QR code below already works and will never change, but diners will see a &ldquo;page not found&rdquo;
+    until you publish the menu. Publish it before the printed material goes on the tables.
+  </div>
+  {% endif %}
+
+  {# ------------------------------------------------------------------ QR #}
+  <section class="pr-card" aria-labelledby="pr-qr-h">
+    <h2 id="pr-qr-h" class="pr-h2">QR code</h2>
+    <div class="pr-qr-grid">
+      <div class="pr-qr-preview">
+        <div class="pr-qr-box" data-pr-qr="brand">{{ qr_svg|safe }}</div>
+        <div class="pr-qr-box" data-pr-qr="black" hidden>{{ qr_svg_black|safe }}</div>
+        <p class="pr-note">Always points to the permanent address below &mdash; printed codes stay valid even if you edit the menu.</p>
+      </div>
+      <div class="pr-qr-side">
+        <label class="pr-label" for="pr-url">Permanent public address</label>
+        <div class="pr-copy">
+          <input id="pr-url" class="pr-input" type="text" readonly value="{{ public_url }}" data-pr-url>
+          <button type="button" class="pr-btn pr-btn--ghost" data-pr-copy>Copy</button>
+          <a class="pr-btn pr-btn--ghost" href="{{ public_url }}" target="_blank" rel="noopener">Open</a>
+        </div>
+        <p class="pr-status" role="status" aria-live="polite" data-pr-copy-status></p>
+
+        <fieldset class="pr-fieldset">
+          <legend class="pr-label">QR colour</legend>
+          <label class="pr-radio"><input type="radio" name="qrcolor" value="brand" checked data-pr-color> Brand colour <span class="pr-swatch" data-color="{{ brand_qr_color }}"></span></label>
+          <label class="pr-radio"><input type="radio" name="qrcolor" value="black" data-pr-color> Black <span class="pr-swatch" data-color="#000000"></span></label>
+          {% if brand_adjusted %}<p class="pr-note">Your brand colour was darkened slightly so the code scans reliably (minimum 7:1 contrast).</p>{% endif %}
+        </fieldset>
+
+        <div class="pr-label">Download</div>
+        <div class="pr-btnrow">
+          <a class="pr-btn" href="{{ urls.qr_svg }}?color=brand" data-pr-dl="svg">SVG (vector)</a>
+          {% for size in png_sizes %}
+          <a class="pr-btn pr-btn--ghost" href="{{ urls.qr_png }}?color=brand&amp;size={{ size }}" data-pr-dl="png">PNG {{ size }} px</a>
+          {% endfor %}
+        </div>
+        <p class="pr-note">SVG is best for print shops (scales without blur). Use PNG 2048 px for Word or Canva.</p>
+      </div>
+    </div>
+  </section>
+
+  {# ------------------------------------------------------------------ Stickers #}
+  <section class="pr-card" aria-labelledby="pr-st-h">
+    <h2 id="pr-st-h" class="pr-h2">Table stickers <span class="pr-muted">A4 sheet, cut marks included</span></h2>
+    <form method="get" action="{{ urls.stickers }}" class="pr-form" data-pr-pdf-form>
+      <div class="pr-fields">
+        <fieldset class="pr-fieldset">
+          <legend class="pr-label">Size</legend>
+          {% for mm, label in sticker_sizes %}
+          <label class="pr-radio"><input type="radio" name="size" value="{{ mm }}"{% if mm == 70 %} checked{% endif %}> {{ label }}</label>
+          {% endfor %}
+          <p class="pr-note">5 cm fits 15 per sheet, 7 cm fits 6, 10 cm fits 2. Prefer 7 cm or more for easy scanning.</p>
+        </fieldset>
+        <fieldset class="pr-fieldset">
+          <legend class="pr-label">Shape</legend>
+          <label class="pr-radio"><input type="radio" name="shape" value="square" checked> Square</label>
+          <label class="pr-radio"><input type="radio" name="shape" value="round"> Round</label>
+        </fieldset>
+        <fieldset class="pr-fieldset">
+          <legend class="pr-label">QR colour</legend>
+          <label class="pr-radio"><input type="radio" name="color" value="brand" checked> Brand</label>
+          <label class="pr-radio"><input type="radio" name="color" value="black"> Black</label>
+        </fieldset>
+        <div class="pr-fieldset">
+          <label class="pr-label" for="st-text">Short text (optional)</label>
+          <input id="st-text" class="pr-input" name="text" type="text" maxlength="{{ max_sticker_text }}" placeholder="e.g. Wi-Fi: ask us for the code">
+        </div>
+      </div>
+      <div class="pr-btnrow">
+        <button type="submit" class="pr-btn">Download PDF</button>
+        <button type="button" class="pr-btn pr-btn--ghost" data-pr-preview>Preview</button>
+      </div>
+      <div class="pr-preview" hidden data-pr-preview-box>
+        <iframe class="pr-frame" title="Sticker sheet preview" data-pr-frame></iframe>
+        <a class="pr-note" target="_blank" rel="noopener" data-pr-open>Open the preview in a new tab</a>
+      </div>
+    </form>
+  </section>
+
+  {# ------------------------------------------------------------------ Tents #}
+  <section class="pr-card" aria-labelledby="pr-tt-h">
+    <h2 id="pr-tt-h" class="pr-h2">Table tents <span class="pr-muted">chevalets</span></h2>
+    <form method="get" action="{{ urls.tent }}" class="pr-form" data-pr-pdf-form>
+      <div class="pr-fields">
+        <fieldset class="pr-fieldset">
+          <legend class="pr-label">Format</legend>
+          <label class="pr-radio"><input type="radio" name="format" value="a5" checked> A5 tent &mdash; one A4 sheet, folded in half</label>
+          <label class="pr-radio"><input type="radio" name="format" value="a6"> A6 tent &mdash; two tents per A4 sheet (cut, then fold)</label>
+          <p class="pr-note">Both faces read the right way up once folded. Print at 100&nbsp;% (&ldquo;actual size&rdquo;), fold on the dashed line.</p>
+        </fieldset>
+        <fieldset class="pr-fieldset">
+          <legend class="pr-label">QR colour</legend>
+          <label class="pr-radio"><input type="radio" name="color" value="brand" checked> Brand</label>
+          <label class="pr-radio"><input type="radio" name="color" value="black"> Black</label>
+        </fieldset>
+        <div class="pr-fieldset">
+          <label class="pr-label" for="tt-line">Extra line (optional)</label>
+          <input id="tt-line" class="pr-input" name="line" type="text" maxlength="{{ max_line }}" placeholder="e.g. Plat du jour à l’ardoise">
+        </div>
+      </div>
+      <div class="pr-btnrow">
+        <button type="submit" class="pr-btn">Download PDF</button>
+        <button type="button" class="pr-btn pr-btn--ghost" data-pr-preview>Preview</button>
+      </div>
+      <div class="pr-preview" hidden data-pr-preview-box>
+        <iframe class="pr-frame" title="Table tent preview" data-pr-frame></iframe>
+        <a class="pr-note" target="_blank" rel="noopener" data-pr-open>Open the preview in a new tab</a>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'printing/print.js' %}" defer></script>{% endblock %}

@@ -1,21 +1,15 @@
-"""Placeholder views; the URL names are stable (see docs/ARCHITECTURE.md)."""
+"""Printing routes (names are stable, see docs/ARCHITECTURE.md; mounted under /admin/)."""
 
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.urls import path
+
+from . import views
 
 app_name = "printing"
 
-
-@login_required
-def placeholder(request, pk):
-    return HttpResponse("Printing not built yet", content_type="text/plain")
-
-
 urlpatterns = [
-    path("r/<int:pk>/print/", placeholder, name="print_page"),
-    path("r/<int:pk>/qr.svg", placeholder, name="qr_svg"),
-    path("r/<int:pk>/qr.png", placeholder, name="qr_png"),
-    path("r/<int:pk>/print/stickers.pdf", placeholder, name="stickers_pdf"),
-    path("r/<int:pk>/print/tent.pdf", placeholder, name="tent_pdf"),
+    path("r/<int:pk>/print/", views.print_page, name="print_page"),
+    path("r/<int:pk>/qr.svg", views.qr_svg, name="qr_svg"),
+    path("r/<int:pk>/qr.png", views.qr_png, name="qr_png"),
+    path("r/<int:pk>/print/stickers.pdf", views.stickers_pdf, name="stickers_pdf"),
+    path("r/<int:pk>/print/tent.pdf", views.tent_pdf, name="tent_pdf"),
 ]
