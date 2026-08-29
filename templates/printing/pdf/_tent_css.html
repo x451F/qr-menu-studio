@@ -1,0 +1,21 @@
+.face { position: relative; width: {{ m.w }}mm; height: {{ m.h }}mm; overflow: hidden; }
+.frame {
+  position: absolute; left: {{ m.side }}mm; top: {{ m.top }}mm; right: {{ m.side }}mm; bottom: {{ m.bottom }}mm;
+  border: {{ m.frame_w }}mm solid {{ brand.accent }}; border-radius: {{ m.radius }}mm; background: {{ brand.tint }};
+  padding: {{ m.pad }}mm; display: flex; flex-direction: row; justify-content: space-between; align-items: stretch;
+}
+.left { width: {{ m.left_w }}mm; display: flex; flex-direction: column; justify-content: space-between; }
+.logo { display: block; max-height: {{ m.logo_h }}mm; max-width: {{ m.logo_w }}mm; }
+.name { color: {{ brand.accent }}; font-size: {{ m.name_pt }}pt; line-height: 1.04; }
+.rule { width: {{ m.rule_w }}mm; height: {{ m.rule_h }}mm; background: {{ brand.accent }}; margin-top: {{ m.rule_gap }}mm; border-radius: 1mm; }
+.cta-fr { font-weight: 700; font-size: {{ m.cta_fr_pt }}pt; line-height: 1.1; color: {{ brand.ink }}; }
+.cta-en { font-weight: 500; font-size: {{ m.cta_en_pt }}pt; line-height: 1.2; color: {{ brand.muted }}; margin-top: {{ m.cta_en_gap }}mm; }
+.line { margin-top: {{ m.line_gap }}mm; font-family: "Display", serif; font-style: italic; font-size: {{ m.line_pt }}pt; line-height: 1.15; color: {{ brand.accent }}; }
+.right { width: {{ m.qr }}mm; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.qrcard { width: {{ m.qr }}mm; height: {{ m.qr }}mm; background: #fff; border-radius: {{ m.qr_radius }}mm; overflow: hidden; }
+.qr { width: {{ m.qr }}mm; height: {{ m.qr }}mm; }
+.url { margin-top: {{ m.url_gap }}mm; font-weight: 600; font-size: {{ m.url_pt }}pt; letter-spacing: 0.01em; color: {{ brand.accent }}; text-align: center; overflow-wrap: anywhere; width: {{ m.qr }}mm; }
+.fold-line { position: absolute; left: 0; right: 0; height: 0; border-top: 0.25mm dashed #b5b5b5; }
+.fold-label { position: absolute; font-size: 5.5pt; letter-spacing: 0.08em; text-transform: uppercase; color: #9a9a9a; background: #fff; padding: 0 1.5mm; }
+.cut-line { position: absolute; top: 0; bottom: 0; width: 0; border-left: 0.25mm dashed #b5b5b5; }
+.tagline { margin-top: {{ m.tag_gap }}mm; font-family: "Display", serif; font-style: italic; font-size: {{ m.tag_pt }}pt; line-height: 1.2; color: {{ brand.muted }}; }

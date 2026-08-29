@@ -1,0 +1,18 @@
+{% extends "printing/pdf/base.html" %}
+{% block doc_title %}Chevalet A5 — {{ brand.name }}{% endblock %}
+{% block css %}
+{% include "printing/pdf/_tent_css.html" %}
+.sheet { position: relative; width: 210mm; height: 297mm; overflow: hidden; }
+.half { position: absolute; left: 0; width: 210mm; height: 148.5mm; }
+.half.top { top: 0; transform: rotate(180deg); }
+.half.bottom { top: 148.5mm; }
+.fold-line { top: 148.5mm; }
+{% endblock %}
+{% block body %}
+<div class="sheet">
+  <div class="half top">{% include "printing/pdf/_tent_face.html" %}</div>
+  <div class="half bottom">{% include "printing/pdf/_tent_face.html" %}</div>
+  <div class="fold-line"></div>
+  <div class="fold-label" style="left: 14mm; top: 146.9mm;">Pli · Fold</div>
+</div>
+{% endblock %}

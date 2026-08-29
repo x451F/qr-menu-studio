@@ -1,0 +1,66 @@
+{% extends "printing/pdf/base.html" %}
+{% block doc_title %}Autocollants {{ size_cm }} cm — {{ brand.name }}{% endblock %}
+{% block css %}
+.sheet { position: relative; width: 210mm; height: 297mm; overflow: hidden; }
+.cell { position: absolute; width: {{ m.size }}mm; height: {{ m.size }}mm; }
+.sticker {
+  position: absolute; left: 0; top: 0; width: {{ m.size }}mm; height: {{ m.size }}mm;
+  background: #fff; overflow: hidden;
+  border-radius: {% if m.round %}50%{% else %}{{ m.radius }}mm{% endif %};
+}
+.guide {
+  position: absolute; left: -0.6mm; top: -0.6mm; width: {{ m.guide }}mm; height: {{ m.guide }}mm;
+  border: 0.2mm solid #cfcfcf;
+  border-radius: {% if m.round %}50%{% else %}{{ m.radius }}mm{% endif %};
+}
+.ring {
+  position: absolute; left: {{ m.ring_inset }}mm; top: {{ m.ring_inset }}mm;
+  width: {{ m.ring_size }}mm; height: {{ m.ring_size }}mm;
+  border: {{ m.ring_w }}mm solid {{ brand.accent }};
+  border-radius: {% if m.round %}50%{% else %}{{ m.ring_radius }}mm{% endif %};
+}
+.content {
+  position: absolute; left: 0; top: 0; width: {{ m.size }}mm; height: {{ m.size }}mm;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: {{ m.pad }}mm;
+}
+.brandline { display: flex; align-items: center; justify-content: center; width: {{ m.inner_w }}mm; }
+.brandline img { max-height: {{ m.logo_h }}mm; max-width: {{ m.inner_w }}mm; }
+.brandline .name { color: {{ brand.accent }}; font-size: {{ m.name_pt }}pt; line-height: 1.05; }
+.qr { width: {{ m.qr }}mm; height: {{ m.qr }}mm; margin: {{ m.gap }}mm 0; flex: none; }
+.cta { width: {{ m.cta_w }}mm; }
+.cta-fr { font-weight: 700; font-size: {{ m.cta_fr_pt }}pt; line-height: 1.15; color: {{ brand.ink }}; }
+.cta-en { font-weight: 500; font-size: {{ m.cta_en_pt }}pt; line-height: 1.15; color: {{ brand.muted }}; }
+.extra { margin-top: {{ m.gap }}mm; font-family: "Display", serif; font-style: italic; font-size: {{ m.text_pt }}pt; line-height: 1.1; color: {{ brand.accent }}; }
+/* crop marks: short ticks in the gutter around each sticker's bounding box */
+.mark { position: absolute; background: #8a8a8a; }
+.mh { height: 0.2mm; width: 1.5mm; }
+.mv { width: 0.2mm; height: 1.5mm; }
+.caption { position: absolute; left: 0; width: 210mm; bottom: 5mm; text-align: center; font-size: 6pt; color: #8a8a8a; }
+{% endblock %}
+{% block body %}
+<div class="sheet">
+{% for c in cells %}
+  <div class="cell" style="left: {{ c.x }}mm; top: {{ c.y }}mm;">
+    <div class="guide"></div>
+    <div class="sticker">
+      <div class="ring"></div>
+      <div class="content">
+        <div class="brandline">{% if brand.logo_uri %}<img src="{{ brand.logo_uri }}" alt="">{% else %}<div class="name display">{{ brand.name }}</div>{% endif %}</div>
+        <div class="qr">{{ qr_svg|safe }}</div>
+        <div class="cta">
+          <div class="cta-fr">{{ cta_fr }}</div>
+          <div class="cta-en">{{ cta_en }}</div>
+        </div>
+        {% if text %}<div class="extra cta">{{ text }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="mark mh" style="left: -2.3mm; top: 0;"></div><div class="mark mv" style="left: 0; top: -2.3mm;"></div>
+    <div class="mark mh" style="left: {{ m.far }}mm; top: 0;"></div><div class="mark mv" style="left: {{ m.size }}mm; top: -2.3mm;"></div>
+    <div class="mark mh" style="left: -2.3mm; top: {{ m.size }}mm;"></div><div class="mark mv" style="left: 0; top: {{ m.far }}mm;"></div>
+    <div class="mark mh" style="left: {{ m.far }}mm; top: {{ m.size }}mm;"></div><div class="mark mv" style="left: {{ m.size }}mm; top: {{ m.far }}mm;"></div>
+  </div>
+{% endfor %}
+  <div class="caption">Imprimer à 100 % (taille réelle) · Print at 100 % actual size · {{ size_cm }} cm</div>
+</div>
+{% endblock %}

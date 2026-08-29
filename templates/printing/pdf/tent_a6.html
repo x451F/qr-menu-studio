@@ -1,0 +1,30 @@
+{% extends "printing/pdf/base.html" %}
+{% block doc_title %}Chevalet A6 — {{ brand.name }}{% endblock %}
+{% block page_rule %}@page { size: A4 landscape; margin: 0; }{% endblock %}
+{% block css %}
+{% include "printing/pdf/_tent_css.html" %}
+/* A4 landscape = two A5-portrait blanks (148.5 x 210 mm). Each folds into an A6 tent (148.5 x 105 mm). */
+.sheet { position: relative; width: 297mm; height: 210mm; overflow: hidden; }
+.piece { position: absolute; top: 0; width: 148.5mm; height: 210mm; }
+.piece.p1 { left: 0; }
+.piece.p2 { left: 148.5mm; }
+.half { position: absolute; left: 0; width: 148.5mm; height: 105mm; overflow: hidden; }
+.half.top { top: 0; transform: rotate(180deg); }
+.half.bottom { top: 105mm; }
+.fold-line { top: 105mm; }
+.cut-line { left: 148.5mm; }
+{% endblock %}
+{% block body %}
+<div class="sheet">
+  {% for p in "12" %}
+  <div class="piece p{{ p }}">
+    <div class="half top">{% include "printing/pdf/_tent_face.html" %}</div>
+    <div class="half bottom">{% include "printing/pdf/_tent_face.html" %}</div>
+    <div class="fold-line"></div>
+    <div class="fold-label" style="left: 10mm; top: 103.4mm;">Pli · Fold</div>
+  </div>
+  {% endfor %}
+  <div class="cut-line"></div>
+  <div class="fold-label" style="left: 132mm; top: 4.5mm;">Découper · Cut</div>
+</div>
+{% endblock %}

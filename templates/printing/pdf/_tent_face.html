@@ -1,0 +1,21 @@
+{# One tent face, designed on a 210 x 148.5 mm canvas (A5 landscape). The fold (peak of the tent) is the TOP edge. #}
+<div class="face">
+  <div class="frame">
+    <div class="left">
+      <div>
+        {% if brand.logo_uri %}<img class="logo" src="{{ brand.logo_uri }}" alt="">{% else %}<div class="name display">{{ brand.name }}</div>{% endif %}
+        {% if tagline %}<div class="tagline">{{ tagline }}</div>{% endif %}
+        <div class="rule"></div>
+      </div>
+      <div class="ctablock">
+        <div class="cta-fr">{{ cta_fr_1 }}<br>{{ cta_fr_2 }}</div>
+        <div class="cta-en">{{ cta_en }}</div>
+        {% if line %}<div class="line">{{ line }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="right">
+      <div class="qrcard"><div class="qr">{{ qr_svg|safe }}</div></div>
+      <div class="url">{{ brand.url_short }}</div>
+    </div>
+  </div>
+</div>
