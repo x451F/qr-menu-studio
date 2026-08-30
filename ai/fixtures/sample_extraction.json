@@ -1,0 +1,44 @@
+{
+  "restaurant": {
+    "name": "Chez Marcelle",
+    "phone": "05 55 12 34 56",
+    "address": "8 rue du Marché\n19000 Tulle",
+    "hours": "Mardi – Samedi : 12h – 14h, 19h – 21h30\nFermé dimanche et lundi"
+  },
+  "categories": [
+    {
+      "name": "Entrées",
+      "description": "",
+      "items": [
+        {"name": "Soupe à l'oignon gratinée", "description": "Gruyère, croûtons dorés", "prices": [{"label": "", "price_text": "8,50 €"}], "allergens": ["gluten", "milk"], "diets": ["vegetarian"]},
+        {"name": "Terrine de campagne maison", "description": "Cornichons, pain grillé", "prices": [{"label": "", "price_text": "9€50"}], "allergens": [], "diets": []},
+        {"name": "Salade de chèvre chaud", "description": "Crottin rôti, noix, miel de châtaignier", "prices": [{"label": "", "price_text": "11,00 €"}], "allergens": ["milk", "nuts"], "diets": ["vegetarian"]},
+        {"name": "Foie gras de canard mi-cuit", "description": "Chutney de figues, brioche toastée", "prices": [{"label": "", "price_text": "16,50 €"}], "allergens": [], "diets": []}
+      ]
+    },
+    {
+      "name": "Plats",
+      "description": "Garniture au choix : frites maison ou salade verte",
+      "items": [
+        {"name": "Confit de canard du Périgord", "description": "Pommes sarladaises", "prices": [{"label": "", "price_text": "18,50 €"}], "allergens": [], "diets": []},
+        {"name": "Entrecôte grillée", "description": "Sauce au poivre ou beurre maître d'hôtel", "prices": [{"label": "250 g", "price_text": "21 €"}, {"label": "400 g", "price_text": "29 €"}], "allergens": ["milk"], "diets": []},
+        {"name": "Filet de truite, beurre blanc", "description": "Riz pilaf, légumes de saison", "prices": [{"label": "", "price_text": "17,90 €"}], "allergens": ["fish", "milk"], "diets": []},
+        {"name": "Risotto aux cèpes", "description": "Parmesan affiné", "prices": [{"label": "", "price_text": "16,00 €"}], "allergens": ["milk"], "diets": ["vegetarian"]},
+        {"name": "Andouillette de Troyes AAAAA", "description": "Moutarde à l'ancienne", "prices": [{"label": "", "price_text": "selon arrivage"}], "allergens": [], "diets": []}
+      ]
+    },
+    {
+      "name": "Desserts et boissons",
+      "description": "",
+      "items": [
+        {"name": "Crème brûlée à la vanille", "description": "", "prices": [{"label": "", "price_text": "7,50 €"}], "allergens": ["eggs", "milk"], "diets": ["vegetarian"]},
+        {"name": "Tarte Tatin, crème fraîche", "description": "", "prices": [{"label": "", "price_text": "8€"}], "allergens": ["gluten", "milk"], "diets": ["vegetarian"]},
+        {"name": "Cahors, Château Lamartine", "description": "Rouge, appellation Cahors", "prices": [{"label": "le verre", "price_text": "5,50 €"}, {"label": "la bouteille", "price_text": "26 €"}], "allergens": ["sulphites"], "diets": []}
+      ]
+    }
+  ],
+  "specials": [
+    {"kind": "plat", "title": "Blanquette de veau à l'ancienne", "description": "Riz pilaf, carottes fondantes", "prices": [{"label": "", "price_text": "14,50 €"}]},
+    {"kind": "formule", "title": "Formule du midi", "description": "Entrée + plat ou plat + dessert, du mardi au vendredi", "prices": [{"label": "", "price_text": "19,90 €"}]}
+  ]
+}
