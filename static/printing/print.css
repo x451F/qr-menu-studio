@@ -33,3 +33,4 @@ a.pr-note { display: inline-block; margin-top: 0.6rem; }
 .pr-preview { margin-top: 1.25rem; }
 .pr-preview[hidden] { display: none; }
 .pr-frame { width: 100%; height: 34rem; max-height: 75vh; border: 1px solid #e3e0d8; border-radius: 8px; background: #f4f2ec; }
+.pr-fieldset + .pr-label { margin-top: 1.25rem; }

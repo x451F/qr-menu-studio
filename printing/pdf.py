@@ -73,7 +73,7 @@ def fit_font_pt(text: str, width_mm: float, max_lines: int, max_pt: float, min_p
     return min_pt
 
 
-def fit_url_pt(text: str, width_mm: float, max_pt: float = 10.0, min_pt: float = 7.0) -> float:
+def fit_url_pt(text: str, width_mm: float, max_pt: float = 10.0, min_pt: float = 8.5) -> float:
     """Font size (pt, Inter semibold ~0.58 em per character) so the URL fits on one line if possible."""
     pt = width_mm / (max(len(text), 1) * 0.58 * 0.3528)
     return round(max(min_pt, min(max_pt, pt)), 1)
@@ -122,7 +122,7 @@ def _base_context(restaurant, color_mode: str) -> dict:
     return {
         "brand": brand,
         "restaurant": restaurant,
-        "tagline": clean_text(tr(restaurant.tagline, "fr"), 80),
+        "tagline": clean_text(tr(restaurant.tagline, "fr"), 50),
         "qr_svg": make_qr_svg_inline(brand.url, brand.qr_color, "#ffffff"),
         "fonts_uri": FONTS_DIR.resolve().as_uri(),
         "cta_fr": CTA_FR,
@@ -243,7 +243,7 @@ def render_stickers(
 A6_SCALE = 0.70711  # A6 face = A5 face / sqrt(2)
 
 
-def tent_metrics(brand: Brand, scale: float = 1.0) -> dict:
+def tent_metrics(brand: Brand, scale: float = 1.0, has_extras: bool = False) -> dict:
     """Metrics (mm / pt) for one face. Designed on A5 landscape (210 x 148.5 mm) and scaled
     for the A6 variant (148.5 x 105 mm) by multiplying every length instead of using CSS
     transforms (which WeasyPrint lays out unreliably inside flex boxes)."""
@@ -266,7 +266,7 @@ def tent_metrics(brand: Brand, scale: float = 1.0) -> dict:
         "left_w": mm(left_w),
         "qr": mm(qr),
         "qr_radius": mm(4),
-        "name_pt": round(fit_font_pt(brand.name, left_w, 4, 34, 18) * k, 1),
+        "name_pt": round(fit_font_pt(brand.name, left_w, 3 if has_extras else 4, 34, 16) * k, 1),
         "logo_h": mm(32),
         "logo_w": mm(left_w),
         "tag_pt": round(14 * k, 1),
@@ -295,6 +295,8 @@ def render_tent(
         fmt = "a5"
     ctx = _base_context(restaurant, color_mode)
     scale = A6_SCALE if fmt == "a6" else 1.0
-    ctx.update({"m": tent_metrics(ctx["brand"], scale), "line": clean_text(line), "fmt": fmt})
+    line = clean_text(line)
+    has_extras = bool(line or ctx["tagline"])
+    ctx.update({"m": tent_metrics(ctx["brand"], scale, has_extras), "line": line, "fmt": fmt})
     template = "printing/pdf/tent_a5.html" if fmt == "a5" else "printing/pdf/tent_a6.html"
     return html_to_pdf(render_to_string(template, ctx))
