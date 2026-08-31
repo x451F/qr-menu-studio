@@ -1,0 +1,29 @@
+# SITE_ADDRESS examples:
+#   :80                  local / plain HTTP (default)
+#   menu.example.fr      public domain -> automatic HTTPS (Let's Encrypt) + HTTP->HTTPS redirect
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# HSTS only when the request came in over HTTPS (never on the plain-HTTP local setup).
+	@https protocol https
+	header @https Strict-Transport-Security "max-age=31536000"
+
+	# Uploaded photos/logos: served straight from the shared data volume (mounted read-only).
+	# File names are unique per upload, so a long cache lifetime is safe.
+	handle /media/* {
+		root * /srv/data
+		header Cache-Control "public, max-age=2592000"
+		file_server
+	}
+
+	# Everything else (including /static/, whose hashed files WhiteNoise serves with
+	# immutable caching) goes to Django.
+	handle {
+		reverse_proxy web:8000
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
