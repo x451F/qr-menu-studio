@@ -89,13 +89,14 @@
 .ai-sec-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 24px 0 8px; }
 .ai-cat { padding: 0; overflow: hidden; }
 .ai-cat__head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #eef0f3; border-bottom: 1px solid var(--ai-line); }
+.ai-hit { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -10px -8px -10px -8px; flex: none; cursor: pointer; }
 .ai-cat__head input[type=checkbox], .ai-item__on { width: 24px; height: 24px; flex: none; margin: 0; accent-color: var(--ai-accent); }
 .ai-cat__name { flex: 1; min-width: 0; }
 .ai-cat__meta { padding: 8px 16px 0; color: var(--ai-muted); font-size: .92rem; }
 .ai-badge { display: inline-block; background: #e3f1e7; color: var(--ai-ok); border-radius: 99px; padding: 1px 10px; font-size: .85rem; font-weight: 600; }
 .ai-item { display: grid; grid-template-columns: 28px 1fr; gap: 4px 12px; padding: 14px 16px; border-top: 1px solid var(--ai-line); }
 .ai-cat__head + .ai-item, .ai-cat__meta + .ai-item { border-top: 0; }
-.ai-item__on { margin-top: 10px; }
+
 .ai-item__body { display: grid; gap: 8px; min-width: 0; }
 .ai-cat.is-off, .ai-item.is-off, .ai-special.is-off { opacity: .5; }
 .ai-cat.is-off .ai-cat__head { opacity: 1; }
@@ -122,14 +123,15 @@
 .ai-chip input:focus-visible + span { outline: 3px solid #2b6cb0; outline-offset: 2px; }
 .ai-special { display: grid; gap: 8px; }
 .ai-special__row { display: grid; grid-template-columns: 28px 1fr; gap: 12px; }
+.ai-foot-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
 .ai-bar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(255,255,255,.97); border-top: 1px solid var(--ai-line);
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 16px rgba(0,0,0,.06);
 }
 .ai-bar__inner { max-width: 760px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.ai-bar__count { flex: 1 1 100%; margin: 0; font-weight: 600; }
-.ai-bar__inner .ai-btn--primary { flex: 1 1 auto; }
+.ai-bar__count { flex: 1 1 100%; margin: 0; font-weight: 600; font-size: .95rem; }
+.ai-bar__inner .ai-btn--primary { flex: 1 1 100%; }
 .ai-toast { display: inline-block; padding: 6px 12px; border-radius: 8px; background: #e3f1e7; color: var(--ai-ok); font-weight: 600; }
 .ai-toast--error { background: var(--ai-bad-bg); color: var(--ai-bad); }
 .ai-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -13,10 +13,10 @@
     <strong>Nothing is saved yet.</strong> Fix any mistakes, untick what you don&rsquo;t want, then import.
   </p>
 
-  {% if show_errors or d.bad_prices %}
-    <div class="ai-card ai-card--bad" role="alert" id="ai-price-alert">
+  {% if d.bad_prices %}
+    <div class="ai-card {% if show_errors %}ai-card--bad{% else %}ai-card--warn{% endif %}" role="alert" id="ai-price-alert">
       <strong>{{ d.bad_prices }} price{{ d.bad_prices|pluralize }} couldn&rsquo;t be read.</strong>
-      Look for the red fields below: type the price (like 12,50) or clear it, then import again.
+      Look for the red fields below: type the price (like 12,50) or clear it{% if show_errors %}, then import again{% endif %}.
     </div>
   {% endif %}
 
@@ -71,7 +71,7 @@
       {% for sp in d.specials %}
         <section class="ai-card ai-special">
           <div class="ai-special__row">
-            <input class="ai-item__on ai-special__on" type="checkbox" name="{{ sp.key }}_on" aria-label="Import this special" {% if sp.include %}checked{% endif %}>
+            <label class="ai-hit"><input class="ai-item__on ai-special__on" type="checkbox" name="{{ sp.key }}_on" aria-label="Import this special" {% if sp.include %}checked{% endif %}></label>
             <div class="ai-item__body">
               <select name="{{ sp.key }}_kind" aria-label="Kind of special">
                 {% for code, label in special_kinds %}<option value="{{ code }}" {% if code == sp.kind %}selected{% endif %}>{{ label }}</option>{% endfor %}
@@ -89,7 +89,7 @@
     {% for cat in d.categories %}
       <section class="ai-card ai-cat" aria-label="Category {{ cat.name }}">
         <div class="ai-cat__head">
-          <input class="ai-cat__on" type="checkbox" name="{{ cat.key }}_on" aria-label="Import this category" {% if cat.include %}checked{% endif %}>
+          <label class="ai-hit"><input class="ai-cat__on" type="checkbox" name="{{ cat.key }}_on" aria-label="Import this category" {% if cat.include %}checked{% endif %}></label>
           <input class="ai-cat__name ai-name" type="text" name="{{ cat.key }}_name" value="{{ cat.name }}" aria-label="Category name" autocomplete="off">
         </div>
         <div class="ai-cat__meta">
@@ -101,14 +101,14 @@
         </div>
         {% for item in cat.items %}
           <article class="ai-item">
-            <input class="ai-item__on" type="checkbox" name="{{ item.key }}_on" aria-label="Import this item" {% if item.include %}checked{% endif %}>
+            <label class="ai-hit"><input class="ai-item__on" type="checkbox" name="{{ item.key }}_on" aria-label="Import this item" {% if item.include %}checked{% endif %}></label>
             <div class="ai-item__body">
               <input type="text" class="ai-name" name="{{ item.key }}_name" value="{{ item.name }}" aria-label="Item name" autocomplete="off">
               <textarea name="{{ item.key }}_desc" rows="2" placeholder="Description (optional)" aria-label="Description">{{ item.description }}</textarea>
               {% include "ai/_price_rows.html" with rows=item.price_rows key=item.key %}
-              <details class="ai-tags"{% if item.chips %} open{% endif %}>
+              <details class="ai-tags">
                 <summary>
-                  {% if item.chips %}Marked on the menu:{% for chip in item.chips %} <span class="ai-badge">{{ chip }}</span>{% endfor %}
+                  {% if item.chips %}Allergens &amp; diets:{% for chip in item.chips %} <span class="ai-badge">{{ chip }}</span>{% endfor %}
                   {% else %}Allergens &amp; diets: none marked{% endif %}
                 </summary>
                 <div class="ai-chips">
@@ -132,9 +132,11 @@
       <div class="ai-bar__inner">
         <p class="ai-bar__count" id="ai-bar-count" aria-live="polite"></p>
         <button type="submit" name="action" value="save" id="ai-import-btn" class="ai-btn ai-btn--primary">Import into menu</button>
-        <button type="submit" name="action" value="update" class="ai-btn">Save draft</button>
-        <button type="submit" id="ai-discard-btn" class="ai-btn ai-btn--danger" formaction="{% url 'ai:import_discard' restaurant.pk draft.pk %}" formnovalidate>Discard</button>
       </div>
+    </div>
+    <div class="ai-foot-actions">
+      <button type="submit" name="action" value="update" class="ai-btn">Save draft for later</button>
+      <button type="submit" id="ai-discard-btn" class="ai-btn ai-btn--danger" formaction="{% url 'ai:import_discard' restaurant.pk draft.pk %}" formnovalidate>Discard import</button>
     </div>
   </form>
 </div>
