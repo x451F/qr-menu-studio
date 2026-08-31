@@ -1,0 +1,9 @@
+<div class="ai-prices">
+  {% for p in rows %}
+    <div class="ai-price{% if p.bad %} is-bad{% endif %}">
+      <input type="text" name="{{ key }}p{{ forloop.counter0 }}_label" value="{{ p.label }}" placeholder="Size / label (optional)" aria-label="Price label" autocomplete="off" maxlength="60">
+      <input type="text" inputmode="decimal" name="{{ key }}p{{ forloop.counter0 }}_text" value="{{ p.text }}" placeholder="Price, e.g. 12,50" aria-label="Price"{% if p.bad %} aria-invalid="true"{% endif %} autocomplete="off" maxlength="60">
+      {% if p.bad %}<p class="ai-price__flag">Couldn&rsquo;t read this price. Type it like 12,50 or clear it.</p>{% endif %}
+    </div>
+  {% endfor %}
+</div>

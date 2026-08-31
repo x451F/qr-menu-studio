@@ -1,0 +1,72 @@
+{% extends "editor/base.html" %}
+{% load static %}
+{% block title %}Import from photo · {{ restaurant.name }}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'ai/import.css' %}">{% endblock %}
+
+{% block content %}
+<div class="ai-page">
+  <a class="ai-back" href="{% url 'editor:restaurant_edit' restaurant.pk %}">&larr; Back to the editor</a>
+  <h1>Import from a photo</h1>
+  <p class="ai-lead">Photograph your paper menu, every page. The AI reads it and you check the result before anything is saved.</p>
+
+  {% if not ai_enabled %}
+    <div class="ai-card ai-card--warn" role="status">
+      <h2>AI import is turned off</h2>
+      <p>To enable it, set the <code>ANTHROPIC_API_KEY</code> environment variable on the server (in <code>.env</code>) and restart the app. Optionally set <code>ANTHROPIC_MODEL</code>.</p>
+      <p>You can still build the menu by hand in the editor.</p>
+      <p><a class="ai-btn ai-btn--primary" href="{% url 'editor:restaurant_edit' restaurant.pk %}">Back to the editor</a></p>
+    </div>
+  {% else %}
+    {% if ai_fake %}<div class="ai-card ai-card--warn" role="note">Demo mode (<code>AI_FAKE</code>): a sample menu is returned instead of reading your photos.</div>{% endif %}
+
+    {% if resume %}
+      <div class="ai-card" role="note">
+        <p><strong>You have an import waiting for review</strong> ({{ resume.items }} item{{ resume.items|pluralize }}, {{ resume.draft.created_at|timesince }} ago).</p>
+        <p><a class="ai-btn" href="{% url 'ai:import_review' restaurant.pk resume.draft.pk %}">Continue reviewing</a></p>
+      </div>
+    {% endif %}
+
+    <form id="ai-form" class="ai-form" method="post" enctype="multipart/form-data" action="{% url 'ai:import' restaurant.pk %}" data-max="{{ max_images }}">
+      {% csrf_token %}
+
+      <div id="ai-error" class="ai-card ai-card--bad ai-error {% if error %}is-on{% endif %}" role="alert" tabindex="-1">
+        <p id="ai-error-text"><strong>{{ error }}</strong></p>
+        <button type="submit" class="ai-btn ai-btn--primary" id="ai-retry" hidden>Try again</button>
+      </div>
+
+      <div class="ai-pick">
+        <label class="ai-btn ai-btn--primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Take a photo
+          <input type="file" name="photos" id="ai-camera" accept="image/*" capture="environment">
+        </label>
+        <label class="ai-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          Choose files
+          <input type="file" name="photos" id="ai-files" accept="image/*" multiple>
+        </label>
+      </div>
+
+      <ul id="ai-thumbs" class="ai-thumbs" aria-label="Selected pages"></ul>
+      <p id="ai-count" class="ai-count" aria-live="polite">Up to {{ max_images }} pages, one photo per page.</p>
+      <ul class="ai-tips">
+        <li>Lay the menu flat, in good light, and fill the frame.</li>
+        <li>For a long menu take one photo per page or column.</li>
+        <li>Blackboards work too. Avoid glare and shadows.</li>
+      </ul>
+
+      <div class="ai-submit-row">
+        <button type="submit" class="ai-btn ai-btn--primary ai-btn--block" id="ai-submit">Read my menu</button>
+      </div>
+
+      <div id="ai-progress" class="ai-card ai-progress" role="status" aria-live="polite">
+        <p class="ai-progress__title">Reading your menu&hellip;</p>
+        <div class="ai-progress__bar" aria-hidden="true"><div id="ai-progress-fill" class="ai-progress__fill"></div></div>
+        <p class="ai-progress__time"><span id="ai-progress-msg">Usually 20&ndash;60 seconds</span> &middot; <span id="ai-elapsed">0 s</span></p>
+      </div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}{% if ai_enabled %}<script src="{% static 'ai/import.js' %}" defer></script>{% endif %}{% endblock %}

@@ -1,24 +1,15 @@
-"""Placeholder views; the URL names are stable (see docs/ARCHITECTURE.md)."""
+"""AI routes. URL names ``import``, ``translate`` and ``translate_missing`` are stable (docs/ARCHITECTURE.md)."""
 
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
 from django.urls import path
+
+from . import views
 
 app_name = "ai"
 
-
-@login_required
-def placeholder(request, pk=None):
-    return HttpResponse("AI import not built yet", content_type="text/plain")
-
-
-@login_required
-def translate_placeholder(request):
-    return JsonResponse({"error": "AI translation not built yet"}, status=503)
-
-
 urlpatterns = [
-    path("r/<int:pk>/import/", placeholder, name="import"),
-    path("r/<int:pk>/translate-missing/", placeholder, name="translate_missing"),
-    path("ai/translate/", translate_placeholder, name="translate"),
+    path("r/<int:pk>/import/", views.import_upload, name="import"),
+    path("r/<int:pk>/import/<int:draft_id>/", views.import_review, name="import_review"),
+    path("r/<int:pk>/import/<int:draft_id>/discard/", views.import_discard, name="import_discard"),
+    path("r/<int:pk>/translate-missing/", views.translate_missing, name="translate_missing"),
+    path("ai/translate/", views.translate, name="translate"),
 ]

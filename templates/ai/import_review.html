@@ -1,0 +1,143 @@
+{% extends "editor/base.html" %}
+{% load static %}
+{% block title %}Review import · {{ restaurant.name }}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'ai/import.css' %}">{% endblock %}
+
+{% block content %}
+<div class="ai-page">
+  <a class="ai-back" href="{% url 'editor:restaurant_edit' restaurant.pk %}">&larr; Back to the editor</a>
+  <h1>Check your menu</h1>
+  <p class="ai-summary">
+    {{ d.categories|length }} categor{{ d.categories|length|pluralize:"y,ies" }}, {{ d.item_total }} item{{ d.item_total|pluralize }}
+    read from {{ draft.page_count }} photo{{ draft.page_count|pluralize }}.
+    <strong>Nothing is saved yet.</strong> Fix any mistakes, untick what you don&rsquo;t want, then import.
+  </p>
+
+  {% if show_errors or d.bad_prices %}
+    <div class="ai-card ai-card--bad" role="alert" id="ai-price-alert">
+      <strong>{{ d.bad_prices }} price{{ d.bad_prices|pluralize }} couldn&rsquo;t be read.</strong>
+      Look for the red fields below: type the price (like 12,50) or clear it, then import again.
+    </div>
+  {% endif %}
+
+  <form id="ai-review" method="post" action="{% url 'ai:import_review' restaurant.pk draft.pk %}">
+    {% csrf_token %}
+    <button type="submit" name="action" value="update" hidden tabindex="-1" aria-hidden="true">Save draft</button>
+
+    <section class="ai-card" aria-labelledby="ai-opts-title">
+      <h2 id="ai-opts-title" class="ai-sr">Import options</h2>
+      <div class="ai-opts">
+        <label class="ai-check">
+          <input type="checkbox" name="opt_merge" {% if d.options.merge_existing %}checked{% endif %}>
+          <span>Add to existing categories with the same name
+            <small>Otherwise every category is created as a new one.</small></span>
+        </label>
+        {% if ai_enabled %}
+        <label class="ai-check">
+          <input type="checkbox" name="opt_translate" {% if d.options.translate %}checked{% endif %}>
+          <span>Also translate to English
+            <small>Uses the AI once more, a few seconds. You can also do it later.</small></span>
+        </label>
+        {% endif %}
+        {% if d.specials %}
+        <label class="ai-check">
+          <input type="checkbox" name="opt_specials" {% if d.options.import_specials %}checked{% endif %}>
+          <span>Import the specials (plat du jour, formule)</span>
+        </label>
+        {% endif %}
+        {% if d.info_available.phone %}
+        <label class="ai-check">
+          <input type="checkbox" name="opt_info_phone" {% if d.options.info.phone %}checked{% endif %}>
+          <span>Set the phone number to <strong>{{ d.info_available.phone }}</strong></span>
+        </label>
+        {% endif %}
+        {% if d.info_available.address %}
+        <label class="ai-check">
+          <input type="checkbox" name="opt_info_address" {% if d.options.info.address %}checked{% endif %}>
+          <span>Set the address to <strong>{{ d.info_available.address|linebreaksbr }}</strong></span>
+        </label>
+        {% endif %}
+        {% if d.info_available.hours %}
+        <label class="ai-check">
+          <input type="checkbox" name="opt_info_hours" {% if d.options.info.hours %}checked{% endif %}>
+          <span>Set the opening hours <small>{{ d.info_available.hours|linebreaksbr }}</small></span>
+        </label>
+        {% endif %}
+      </div>
+    </section>
+
+    {% if d.specials %}
+      <div class="ai-sec-title"><h2>Specials</h2></div>
+      {% for sp in d.specials %}
+        <section class="ai-card ai-special">
+          <div class="ai-special__row">
+            <input class="ai-item__on ai-special__on" type="checkbox" name="{{ sp.key }}_on" aria-label="Import this special" {% if sp.include %}checked{% endif %}>
+            <div class="ai-item__body">
+              <select name="{{ sp.key }}_kind" aria-label="Kind of special">
+                {% for code, label in special_kinds %}<option value="{{ code }}" {% if code == sp.kind %}selected{% endif %}>{{ label }}</option>{% endfor %}
+              </select>
+              <input type="text" class="ai-name" name="{{ sp.key }}_title" value="{{ sp.title }}" aria-label="Title" autocomplete="off">
+              <textarea name="{{ sp.key }}_desc" rows="2" aria-label="Description">{{ sp.description }}</textarea>
+              {% include "ai/_price_rows.html" with rows=sp.price_rows key=sp.key %}
+            </div>
+          </div>
+        </section>
+      {% endfor %}
+    {% endif %}
+
+    <div class="ai-sec-title"><h2>Menu</h2></div>
+    {% for cat in d.categories %}
+      <section class="ai-card ai-cat" aria-label="Category {{ cat.name }}">
+        <div class="ai-cat__head">
+          <input class="ai-cat__on" type="checkbox" name="{{ cat.key }}_on" aria-label="Import this category" {% if cat.include %}checked{% endif %}>
+          <input class="ai-cat__name ai-name" type="text" name="{{ cat.key }}_name" value="{{ cat.name }}" aria-label="Category name" autocomplete="off">
+        </div>
+        <div class="ai-cat__meta">
+          {{ cat.items|length }} item{{ cat.items|length|pluralize }}
+          {% if cat.existing %}<span class="ai-badge">Already in your menu, items will be added to it</span>{% endif %}
+        </div>
+        <div class="ai-cat__meta">
+          <input type="text" name="{{ cat.key }}_desc" value="{{ cat.description }}" placeholder="Category note (optional)" aria-label="Category note" autocomplete="off">
+        </div>
+        {% for item in cat.items %}
+          <article class="ai-item">
+            <input class="ai-item__on" type="checkbox" name="{{ item.key }}_on" aria-label="Import this item" {% if item.include %}checked{% endif %}>
+            <div class="ai-item__body">
+              <input type="text" class="ai-name" name="{{ item.key }}_name" value="{{ item.name }}" aria-label="Item name" autocomplete="off">
+              <textarea name="{{ item.key }}_desc" rows="2" placeholder="Description (optional)" aria-label="Description">{{ item.description }}</textarea>
+              {% include "ai/_price_rows.html" with rows=item.price_rows key=item.key %}
+              <details class="ai-tags"{% if item.chips %} open{% endif %}>
+                <summary>
+                  {% if item.chips %}Marked on the menu:{% for chip in item.chips %} <span class="ai-badge">{{ chip }}</span>{% endfor %}
+                  {% else %}Allergens &amp; diets: none marked{% endif %}
+                </summary>
+                <div class="ai-chips">
+                  {% for code, label in allergens %}
+                    <label class="ai-chip"><input type="checkbox" name="{{ item.key }}_al" value="{{ code }}" {% if code in item.allergens %}checked{% endif %}><span>{{ label }}</span></label>
+                  {% endfor %}
+                  {% for code, label in diets %}
+                    <label class="ai-chip"><input type="checkbox" name="{{ item.key }}_di" value="{{ code }}" {% if code in item.diets %}checked{% endif %}><span>{{ label }}</span></label>
+                  {% endfor %}
+                </div>
+              </details>
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+    {% empty %}
+      <div class="ai-card ai-card--warn">No dishes were found in the photo. Try again with a sharper, closer photo.</div>
+    {% endfor %}
+
+    <div class="ai-bar">
+      <div class="ai-bar__inner">
+        <p class="ai-bar__count" id="ai-bar-count" aria-live="polite"></p>
+        <button type="submit" name="action" value="save" id="ai-import-btn" class="ai-btn ai-btn--primary">Import into menu</button>
+        <button type="submit" name="action" value="update" class="ai-btn">Save draft</button>
+        <button type="submit" id="ai-discard-btn" class="ai-btn ai-btn--danger" formaction="{% url 'ai:import_discard' restaurant.pk draft.pk %}" formnovalidate>Discard</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'ai/import.js' %}" defer></script>{% endblock %}
