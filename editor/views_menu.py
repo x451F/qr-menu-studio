@@ -314,6 +314,7 @@ def item_delete(request, pk):
     item = get_item(pk)
     category = item.category
     restaurant = category.restaurant
+    _discard_undo_photo(request)
     request.session[UNDO_KEY] = {
         "restaurant": restaurant.pk,
         "category": category.pk,
@@ -330,6 +331,9 @@ def item_delete(request, pk):
         },
     }
     label = (item.name or {}).get("fr") or (item.name or {}).get("en") or "Item"
+    # Keep the photo file (and its variants) so Undo can restore it: the post_delete cleanup
+    # signal only removes files still attached to the instance.
+    item.photo = None
     item.delete()
     restaurant.touch()
     html = render_to_string(
@@ -339,6 +343,18 @@ def item_delete(request, pk):
     )
     html += missing_oob(restaurant)
     return HttpResponse(html)
+
+
+def _discard_undo_photo(request):
+    """Delete the photo kept for a previous, never-used undo snapshot."""
+    snap = request.session.get(UNDO_KEY)
+    name = (snap or {}).get("fields", {}).get("photo")
+    if name and not Item.objects.filter(photo=name).exists():
+        from django.core.files.storage import default_storage
+
+        from menus.images import delete_with_variants
+
+        delete_with_variants(default_storage, name)
 
 
 @staff_required
