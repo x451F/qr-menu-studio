@@ -109,6 +109,7 @@
     $('.sheet-body', sheet).scrollTop = 0;
   }
 
+  for (const a of $$('.dish-link')) a.setAttribute('aria-haspopup', 'dialog');
   const openDish = (li, cold) => { fill(li); openDlg(sheet, '#' + li.id, cold); };
   document.addEventListener('click', e => {
     const a = e.target.closest('.dish-link');
@@ -122,7 +123,7 @@
   }
 
   // --- search + filter -------------------------------------------------------------------------
-  if (!fdlg) return;
+  if (!fdlg || !$('#fbtn')) return;
   const KEY = 'mf' + location.pathname;
   const fbtn = $('#fbtn'), fstat = $('#fstat'), q = $('#fq'), form = $('#fform'), show = $('#fshow');
   fbtn.hidden = false;

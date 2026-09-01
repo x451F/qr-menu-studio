@@ -60,7 +60,7 @@
 <h3 class="s-h" id="s-dh" hidden>{{ s.diets }}</h3><ul class="s-tags" id="s-diets"></ul>
 <h3 class="s-h" id="s-ah" hidden>{{ s.allergens }}</h3><ul class="s-tags" id="s-al"></ul></div></div>
 </div></dialog>
-{% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<dialog class="sheet" id="filters" aria-labelledby="f-title"><div class="sheet-in">
+{% if menu.categories|length > 1 or menu.item_count >= 20 %}{% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<dialog class="sheet" id="filters" aria-labelledby="f-title"><div class="sheet-in">
 <button type="button" class="x" data-close aria-label="{{ s.close }}"><svg class="ic" aria-hidden="true"><use href="#ui-close"/></svg></button>
 <form class="sheet-body" id="fform" onsubmit="return false"><div class="grip" aria-hidden="true"></div>
 <h2 class="s-name" id="f-title">{{ s.filter_title }}</h2>
@@ -69,6 +69,6 @@
 {% if menu.legend_allergens %}<fieldset class="chk"><legend class="s-h">{{ s.hide_containing }}</legend><div class="alist">{% for t in menu.legend_allergens %}<label class="arow"><input type="checkbox" name="al" value="{{ t.code }}"><svg class="ic" aria-hidden="true"><use href="#al-{{ t.code }}"/></svg><span>{{ t.label }}</span></label>{% endfor %}</div></fieldset>{% endif %}
 <p class="fnote">{{ s.filter_note }}</p>
 <div class="factions"><button type="button" class="link" id="freset2">{{ s.reset }}</button><button type="button" class="cta" id="fshow" data-n="{{ s.show_n }}" data-one="{{ s.show_1 }}" data-none="{{ s.no_results }}"></button></div>
-</form></div></dialog>{% endif %}
+</form></div></dialog>{% endif %}{% endif %}
 </body>
 </html>

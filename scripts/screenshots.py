@@ -127,8 +127,12 @@ GATES_JS = """() => {
 }"""
 
 
+AXE_JS = "() => axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']}}).then(r => r.violations.map(v => v.id + ' (' + v.impact + ') x' + v.nodes.length + ' ' + v.nodes.slice(0, 2).map(n => n.target.join(' ')).join(' | ')))"
+
+
 def gates(args, browser):
     ok = True
+    axe = Path(args.axe) if args.axe else None
     for width in (320, 375, 1280):
         ctx = new_ctx(browser, width)
         pg = login(ctx, args.base)
@@ -137,12 +141,17 @@ def gates(args, browser):
         pg.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
         for theme in args.themes:
             for mode in args.modes:
-                for slug in args.gate_slugs:
+                for slug in [slug_for(args, theme), *args.gate_slugs]:
                     pg.goto(url_for(args.base, slug, theme, mode))
                     pg.wait_for_load_state("networkidle")
                     r = pg.evaluate(GATES_JS)
                     bad = r["overflow"] > 0 or r["small"]
                     ok &= not bad
+                    if axe and width == 375:
+                        pg.add_script_tag(path=str(axe))
+                        for v in pg.evaluate(AXE_JS):
+                            print("   axe", theme, mode, v)
+                            ok = False
                     print(("FAIL" if bad else "ok  "), width, theme, mode, slug, r if bad else "")
         if errors:
             ok = False
@@ -214,7 +223,8 @@ def main():
     ap.add_argument("--scroll", type=int, default=1500, help="mobile mid-menu crop offset")
     ap.add_argument("--format", default="png", choices=["png", "webp"])
     ap.add_argument("--gates", action="store_true")
-    ap.add_argument("--gate-slugs", default="bistrot-des-halles,chez-gino,petit-kiosque,maison-vialle,auberge-du-puy-blanc")
+    ap.add_argument("--gate-slugs", default="", help="extra slugs to gate with every theme")
+    ap.add_argument("--axe", default="", help="path to axe.min.js to run accessibility checks in --gates")
     ap.add_argument("--interactions", action="store_true")
     ap.add_argument("--contact", action="store_true")
     ap.add_argument("--no-matrix", action="store_true")
@@ -223,7 +233,7 @@ def main():
     args.modes = args.modes.split(",")
     args.widths = [int(w) for w in args.widths.split(",")]
     args.photos = [p == "on" for p in args.photos.split(",")]
-    args.gate_slugs = args.gate_slugs.split(",")
+    args.gate_slugs = [x for x in args.gate_slugs.split(",") if x]
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
