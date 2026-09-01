@@ -19,7 +19,7 @@ from io import BytesIO
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from PIL import Image, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageFile, ImageOps, UnidentifiedImageError
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +60,10 @@ def _open_image(file) -> Image.Image:
         )
     if hasattr(file, "seek"):
         file.seek(0)
+    # WeasyPrint sets the global ImageFile.LOAD_TRUNCATED_IMAGES = True on import; uploads must
+    # still be fully decodable, so force strict loading here (sync gunicorn workers: no races).
+    previous_truncated = ImageFile.LOAD_TRUNCATED_IMAGES
+    ImageFile.LOAD_TRUNCATED_IMAGES = False
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", Image.DecompressionBombWarning)
@@ -75,6 +79,8 @@ def _open_image(file) -> Image.Image:
         raise ValidationError("This image has too many pixels. Please upload a smaller picture.") from None
     except (UnidentifiedImageError, OSError, SyntaxError, ValueError, EOFError):
         raise ValidationError("This file is not a valid image. Please upload a JPEG, PNG or WebP file.") from None
+    finally:
+        ImageFile.LOAD_TRUNCATED_IMAGES = previous_truncated
     return img
 
 
