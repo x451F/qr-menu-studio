@@ -1,0 +1,21 @@
+Lighthouse (mobile preset, simulated slow 4G, Lighthouse CLI via npx, headless Chrome shell), 2026-09-01.
+Server: production-like, NOT runserver: DJANGO_DEBUG=0, dummy DJANGO_SECRET_KEY, `collectstatic`
+(CompressedManifestStaticFilesStorage hashed files), `gunicorn` (2 workers) behind a tiny local WSGI wrapper that
+serves /media and gzips text responses (Caddy does both in production). Pages: the five seed restaurants.
+Final numbers on the Docker/Caddy stack are to be re-measured by QA after integration.
+Performance/Accessibility/Best-practices/SEO scores are 0-100.
+
+bistrot-des-halles: perf 97 a11y 100 best-practices 100 seo 100 | FCP 0.9 s LCP 2.6 s TBT 0 ms CLS 0 SI 0.9 s | Total size was 299 KiB
+    audits < 0.9: largest-contentful-paint(0.88), network-dependency-tree-insight(0)
+chez-gino: perf 98 a11y 100 best-practices 100 seo 100 | FCP 1.4 s LCP 2.3 s TBT 0 ms CLS 0 SI 1.4 s | Total size was 240 KiB
+    audits < 0.9: network-dependency-tree-insight(0)
+petit-kiosque: perf 100 a11y 100 best-practices 100 seo 100 | FCP 0.9 s LCP 1.7 s TBT 0 ms CLS 0.009 SI 0.9 s | Total size was 111 KiB
+    audits < 0.9: network-dependency-tree-insight(0)
+maison-vialle: perf 99 a11y 100 best-practices 100 seo 100 | FCP 1.2 s LCP 2.2 s TBT 0 ms CLS 0 SI 1.2 s | Total size was 253 KiB
+    audits < 0.9: network-dependency-tree-insight(0)
+auberge-du-puy-blanc: perf 99 a11y 100 best-practices 100 seo 100 | FCP 1.2 s LCP 2.1 s TBT 0 ms CLS 0 SI 1.2 s | Total size was 217 KiB
+    audits < 0.9: network-dependency-tree-insight(0)
+
+Notes: LCP of the bistro page (2.6 s) is its logo/first photo; all pages: TBT 0 ms, CLS <= 0.009.
+The only remaining sub-0.9 audit is Lighthouse's informational "network dependency tree" insight (HTML -> preloaded font).
+HTML weight (gzip): 80-dish trattoria page = ~15 KB, 5-dish cafe page = ~5 KB. Inline CSS ~19 KB raw / ~5 KB gzip, menu.js 5.2 KB raw / 2.4 KB gzip.

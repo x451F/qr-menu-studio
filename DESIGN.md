@@ -1,6 +1,6 @@
 # QR Menu Studio: public menu design
 
-Status: design proposal (no theme code yet).
+Status: implemented. Sections 1-9 are the approved design; section 10 lists the review amendments and every place the build differs from the proposal.
 Inputs: `public/menu_context.py` (template context), `menus/constants.py`, `menus/seed_data.py`, docs/ARCHITECTURE.md (performance targets).
 
 The public menu is what restaurant owners judge. The bar is "a well-designed restaurant website",
@@ -376,10 +376,10 @@ One SVG sprite of 17 `<symbol>`s, `viewBox="0 0 24 24"`. Public pages inline **o
 
 | Item | Target |
 |---|---|
-| HTML (80 dishes, 5 photos) | <= 40 KB raw, <= 9 KB gzip (`<use>` icons, no per-row inline SVG duplication) |
-| Inline CSS (base + theme, minified) | <= 13 KB raw / <= 4.5 KB gzip (PLAN ceiling is 20 KB gz) |
+| HTML (80 dishes, 5 photos) | proposed <= 9 KB gzip; **as built ~15 KB gzip / 110 KB raw** for the 81-dish seed (per-row `data-*`, icon `<use>`s and hidden labels); 5-dish page ~5 KB gzip |
+| Inline CSS (base + theme, minified) | proposed <= 13 KB raw / 4.5 KB gzip; **as built ~19.5 KB raw / ~5.1 KB gzip** (PLAN ceiling 20 KB gz). Enforced by `test_templates.py` (<= 22 KB raw, <= 5.5 KB gz) |
 | Fonts | 3 to 4 WOFF2 latin files per theme, <= 75 KB total, <= 40 KB render-blocking (2 preloaded: display face + body regular). `latin-ext` only through `unicode-range` |
-| JS | one deferred file `menu.js`, **<= 6 KB min (target 4.5 KB), <= 2.2 KB gz**, no dependencies. Features: scroll-spy, sheet + history + swipe, search/filter. Everything else is CSS. |
+| JS | one deferred file `menu.js`, **5.2 KB min / 2.4 KB gz**, no dependencies (source `menu.src.js`, rebuilt with `npx esbuild ... --minify`). Features: scroll-spy, sheet + history + swipe, search/filter. Everything else is CSS. |
 | Images | thumbnails `srcset` 480/960 WebP via `PhotoView`, `sizes="88px"` (`112px` >= 720 px), `loading="lazy" decoding="async"`, explicit `width`/`height`, first 4 thumbs eager. Sheet image loaded on open. Fixed thumb boxes (no CLS) |
 | Requests on first load | HTML + 2 fonts (+ `menu.js`) + thumbs; nothing third-party; no analytics |
 | Lighthouse (mobile, throttled) | Performance >= 95, Accessibility >= 95 (aim 100), Best Practices >= 95, CLS < 0.02, LCP < 1.8 s |
@@ -410,7 +410,7 @@ visible focus for keyboard: `:focus-visible { outline: 3px solid var(--focus); o
 
 ---
 
-## 9. Decisions and assumptions to confirm
+## 9. Decisions and assumptions (all resolved, see section 10)
 
 1. **Allergen data completeness.** A filter can only be as trustworthy as the data. Proposal: no new field; the sheet says "indication fournie par le restaurant" and dishes with *no* allergen tags are never hidden by an allergen filter. (Alternative: a restaurant-level "allergens fully declared" flag that enables the allergen filter.)
 2. **Inline used-symbol sprite** on public pages (external `icons.svg` remains for the editor). Needs nothing from you.
@@ -421,3 +421,45 @@ visible focus for keyboard: `:focus-visible { outline: 3px solid var(--focus); o
 7. **Robots/preview**: `noindex` on preview only; public menu indexable. Tell me if menus should be `noindex` by default.
 8. **Logo vs name**: both are always shown (logo above the name). Confirm this rather than "logo replaces the name" (which silently loses the `h1` and looks wrong for icon-only logos).
 9. **Fonts**: ten OFL families across five themes (about 60 to 70 KB each theme) will be vendored in `static/public/fonts/`; licence files are included. Fontsource file availability was checked (HTTP 200 for the latin files listed).
+
+---
+
+## 10. Review amendments and as-built notes
+
+**Answers to section 9.** (1) Allergen trust as proposed: no new field, untagged dishes are never hidden by an allergen filter,
+safety wording shown in the filter sheet. (2) Inline used-symbol sprite approved (external `icons.svg` stays for the editor).
+(3) `STATICFILES_DIRS=[BASE_DIR/"static"]`, WhiteNoise hashed storage when DEBUG is off; `inline_css` reads the *source* CSS through
+`finders.find()`; fonts and `menu.js` use `{% static %}` (hashed). (4) `PhotoView.srcset` may be empty: handled (thumbnail falls back to `src`).
+(5) Hours `Label : times` split approved. (6) Search in the filter sheet at >= 20 dishes: yes. (7) Public menus stay indexable; `noindex` only on
+`?preview=1`. (8) Logo and name both always shown. (9) Fonts approved, within budget.
+
+**Amendments applied**
+- **a. Every dish row with detail is an accessible control.** The dish *name* is `<h3><a class="dish-link" href="#dish-N">` with a stretched
+  `::after` covering the whole row (accessible name = dish name; heading semantics kept). Without JS it anchors to the row; with JS it opens the
+  sheet (`aria-haspopup="dialog"`). Rows with only a name and a price (no description, photo, allergen or diet) render plain text and no link; they
+  have no visible affordance, and linked rows show none either (press/hover tint only), so the menu stays visually consistent.
+- **b. Row descriptions clamp to 2 lines** (`line-clamp`); the sheet shows the full text. A `<noscript><style>` un-clamps the text without JS.
+  Any row with a description is a link, so every clamped description opens the sheet.
+- **c. `content-visibility: auto` kept** (`.cat{content-visibility:auto;contain-intrinsic-size:auto 900px}`) after testing: on the 81-dish seed
+  and an 80-item local menu, every chip jump (down and up, 375 and 1280 px) and cold `#cat-N` loads land the heading at the same offset under the
+  sticky bar (deviation <= 4 px). Re-test if category markup changes.
+- **d. Bistro leaders only on single-price rows** (the `.lead` element is only rendered when there is exactly one price).
+- **e. Lighthouse measured on a production-like server** (`docs/screenshots/lighthouse.txt`): performance 97-100, accessibility 100, best practices 100, SEO 100.
+- **f. Preview:** no visible chrome; `noindex, nofollow` meta only.
+- **g/h.** Screenshot matrix in `docs/screenshots/` (webp, 375 px viewport + mid-menu crop, 1280 px full page; light/dark; photos/no photos; native seed restaurant per theme), interaction shots, contact sheets, `icons.png`, `CRITIQUE.md`.
+
+**As built, differences from the proposal**
+- Fonts are vendored flat as `static/public/fonts/<family>-<subset>-<weight>-<style>.woff2` (latin + latin-ext, `unicode-range`), licences in `fonts/LICENSES/`.
+  `fonttools` check: every latin file has Œ œ € NBSP; Fraunces and Nunito Sans have no `tnum`, so prices are never set in them (bistro prices use
+  Instrument Sans, cafe prices use Bricolage Grotesque, which has `tnum`). Metric-matched fallbacks were measured with fonttools.
+- **Photo rows on mobile** stack the price *under* the name (a 300 px row cannot hold name + price + thumbnail); multi-size prices become a two-column grid
+  (label | amount, amounts right-aligned). At >= 720 px the price stays beside the name. All-photos two-column grids exist only at 720-1023 px and >= 1200 px (page widens to 72 rem).
+- Multi-price *specials* render as a full-width price block under the title in every theme (long labels such as "Entrée + plat + dessert").
+- Desktop with no chip bar (single category, < 20 dishes) is a centred single column; the filter dialog exists only when the chip bar does.
+- Theming: tinting of neutrals keeps their lightness and shifts only hue/chroma (2x`tint` of the brand's a/b). White or near-white brands become neutral greys
+  (roles derive from L clamped to the role range), they do not become "champagne". A dark-mode logo plate (`--logo-bg`, `--logo-pad`) is emitted
+  because the demo logos are transparent PNGs drawn for light backgrounds.
+- CSP: the page uses one inline `<style>` and no inline script (external `menu.js`), compatible with `style-src 'self' 'unsafe-inline'`.
+- Icons: 14 allergens, 3 diets (circle badge) and 7 UI icons; sprite 7.4 KB; the shrimp glyph is the weakest at 16 px.
+- `public/tests/test_templates.py` (in addition to `test_theming.py`) covers rendering for 5 themes x 3 modes, budgets, sprite and font coverage.
+- `scripts/screenshots.py` also runs the gates: overflow at 320/375/1280, tap targets >= 44 px, console errors, axe-core (WCAG 2 A/AA + best practices) with `--gates --axe <axe.min.js>`.
