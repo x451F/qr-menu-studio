@@ -92,6 +92,7 @@ main{flex:1 0 auto;outline:0}
 /* categories and dishes */
 .cat{padding-top:var(--s7);scroll-margin-top:-36px}
 .cat:first-child{padding-top:var(--s4);scroll-margin-top:0}
+.cat{content-visibility:auto;contain-intrinsic-size:auto 900px}
 .cat-head h2{font:var(--w-h) var(--h2)/1.15 var(--font-display);text-wrap:balance}
 .cat-desc{margin-top:var(--s1);color:var(--ink-2);max-width:34rem;text-wrap:pretty}
 .cat-head{margin-bottom:var(--s3)}
