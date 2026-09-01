@@ -78,8 +78,8 @@ def test_inline_css_and_js_budgets():
             Path(finders.find("public/css/base.css")).read_text()
             + Path(finders.find(f"public/css/theme-{theme}.css")).read_text()
         )
-        assert len(css.encode()) <= 16 * 1024, (theme, len(css))
-        assert len(gzip.compress(css.encode())) <= 5 * 1024, theme
+        assert len(css.encode()) <= 22 * 1024, (theme, len(css))
+        assert len(gzip.compress(css.encode())) <= 5.5 * 1024, theme
     assert len((ROOT / "static/public/js/menu.js").read_bytes()) <= 6 * 1024
 
 

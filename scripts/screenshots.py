@@ -21,6 +21,10 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 THEMES = ["bistro", "trattoria", "cafe", "gastro", "auberge"]
+NATIVE = {
+    "bistro": "bistrot-des-halles", "trattoria": "chez-gino", "cafe": "petit-kiosque",
+    "gastro": "maison-vialle", "auberge": "auberge-du-puy-blanc",
+}
 SIZES = {375: (375, 812, 2), 1280: (1280, 900, 1)}
 
 
@@ -78,6 +82,10 @@ def save(pg, path: Path, full=False, fmt="png"):
         tmp.unlink()
 
 
+def slug_for(args, theme):
+    return NATIVE[theme] if args.slug == "native" else args.slug
+
+
 def matrix(args, browser):
     out = Path(args.out)
     for width in args.widths:
@@ -87,7 +95,7 @@ def matrix(args, browser):
             for mode in args.modes:
                 for photos in args.photos:
                     name = f"{theme}-{mode}-{width}" + ("" if photos else "-nophotos")
-                    pg.goto(url_for(args.base, args.slug, theme, mode, photos))
+                    pg.goto(url_for(args.base, slug_for(args, theme), theme, mode, photos))
                     pg.wait_for_load_state("networkidle")
                     pg.evaluate("document.fonts.ready")
                     pg.wait_for_timeout(250)
@@ -148,7 +156,7 @@ def interactions(args, browser):
     ctx = new_ctx(browser, 375)
     pg = login(ctx, args.base)
     theme = args.themes[0]
-    pg.goto(url_for(args.base, args.slug, theme, args.modes[0]))
+    pg.goto(url_for(args.base, slug_for(args, theme), theme, args.modes[0]))
     pg.wait_for_load_state("networkidle")
     # dish sheet
     pg.locator(".dish-link").nth(0).click()
@@ -198,7 +206,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", default="http://127.0.0.1:8003")
     ap.add_argument("--out", default="docs/screenshots")
-    ap.add_argument("--slug", default="bistrot-des-halles")
+    ap.add_argument("--slug", default="native", help="a slug, or native = each theme's own demo restaurant")
     ap.add_argument("--themes", default=",".join(THEMES))
     ap.add_argument("--modes", default="light,dark")
     ap.add_argument("--widths", default="375,1280")
@@ -206,7 +214,7 @@ def main():
     ap.add_argument("--scroll", type=int, default=1500, help="mobile mid-menu crop offset")
     ap.add_argument("--format", default="png", choices=["png", "webp"])
     ap.add_argument("--gates", action="store_true")
-    ap.add_argument("--gate-slugs", default="bistrot-des-halles,petit-kiosque")
+    ap.add_argument("--gate-slugs", default="bistrot-des-halles,chez-gino,petit-kiosque,maison-vialle,auberge-du-puy-blanc")
     ap.add_argument("--interactions", action="store_true")
     ap.add_argument("--contact", action="store_true")
     ap.add_argument("--no-matrix", action="store_true")
