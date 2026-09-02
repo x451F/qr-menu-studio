@@ -203,8 +203,8 @@ def test_ai_buttons_hidden_when_ai_disabled(client, restaurant, item, settings):
     body = client.get(url).content.decode()
     assert "Translate missing with AI" not in body
     assert "data-translate>" not in body and "data-translate " not in body
-    assert "Import from photo" not in body
+    assert "Import photo" not in body
     settings.AI_ENABLED = True
     body = client.get(url).content.decode()
     assert "Translate missing with AI" in body
-    assert "Import from photo" in body
+    assert "Import photo" in body

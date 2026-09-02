@@ -296,11 +296,11 @@ body.page-edit { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 .ed-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .ed-head__title { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .ed-head__title .h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ed-actions { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 10px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none; }
-.ed-actions::-webkit-scrollbar { display: none; }
-.ed-actions .btn { flex: none; }
+.ed-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 2px 0 10px; }
+.ed-actions .btn { min-width: 0; justify-content: flex-start; }
+.ed-actions .btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 1024px) { .chips--scroll { flex-wrap: wrap; overflow: visible; } }
-@media (min-width: 1024px) { .ed-actions { margin: 0; padding: 2px 0 12px; flex-wrap: wrap; } }
+@media (min-width: 1024px) { .ed-actions { display: flex; flex-wrap: wrap; padding: 2px 0 12px; } .ed-actions .btn { flex: none; } }
 .settings-note { margin: 0 0 14px; }
 
 .pubchip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px 0 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); flex: none; font-size: 14px; }

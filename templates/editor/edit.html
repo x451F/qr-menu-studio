@@ -20,8 +20,8 @@
     <nav class="ed-actions" aria-label="Restaurant actions">
       <a class="btn btn--sm" href="{% url 'editor:restaurant_settings' restaurant.pk %}">{% icon 'sliders' %}<span>Settings</span></a>
       <a class="btn btn--sm" href="{% url 'printing:print_page' restaurant.pk %}">{% icon 'printer' %}<span>Print &amp; QR</span></a>
-      {% if AI_ENABLED %}<a class="btn btn--sm" href="{% url 'ai:import' restaurant.pk %}">{% icon 'camera' %}<span>Import from photo</span></a>{% endif %}
-      <a class="btn btn--sm" href="{{ restaurant.public_path }}{% if not restaurant.is_published %}?preview=1{% endif %}" target="_blank" rel="noopener">{% icon 'external' %}<span>View public page</span></a>
+      {% if AI_ENABLED %}<a class="btn btn--sm" href="{% url 'ai:import' restaurant.pk %}">{% icon 'camera' %}<span>Import photo</span></a>{% endif %}
+      <a class="btn btn--sm" href="{{ restaurant.public_path }}{% if not restaurant.is_published %}?preview=1{% endif %}" target="_blank" rel="noopener">{% icon 'external' %}<span>View menu</span></a>
     </nav>
 
     {% if english_on %}
