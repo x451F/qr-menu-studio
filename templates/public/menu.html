@@ -25,16 +25,16 @@
 <h1 class="name">{{ menu.name }}</h1>
 {% if menu.tagline %}<p class="tagline">{{ menu.tagline }}</p>{% endif %}</div>
 </header>
-{% if menu.specials %}<section class="today" aria-labelledby="today-h"><div class="today-card">
-<h2 class="eyebrow" id="today-h">{{ s.today }}</h2>
-<ul class="specials">{% for sp in menu.specials %}<li class="sp" data-kind="{{ sp.kind }}"><p class="sp-kind">{{ sp.kind_label }}</p><div class="sp-row"><h3 class="sp-title">{{ sp.title }}</h3>{% if sp.prices %}<div class="dish-prices">{% include "public/_prices.html" with prices=sp.prices %}</div>{% endif %}</div>{% if sp.description %}<p class="sp-desc">{{ sp.description }}</p>{% endif %}</li>{% endfor %}</ul>
-</div></section>{% endif %}
-{% if menu.categories|length > 1 or menu.item_count >= 20 %}<nav class="bar" aria-label="{{ s.categories }}">
-<ul>{% for cat in menu.categories %}<li><a href="#{{ cat.anchor }}">{{ cat.name }}</a></li>{% endfor %}</ul>
+{% if menu.specials or menu.categories|length > 1 or menu.item_count >= 20 %}<nav class="bar" aria-label="{{ s.categories }}">
+<ul>{% if menu.specials %}<li><a class="today-chip" href="#today">{{ s.today }}</a></li>{% endif %}{% for cat in menu.categories %}<li><a href="#{{ cat.anchor }}">{{ cat.name }}</a></li>{% endfor %}</ul>
 {% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<button type="button" class="fbtn" id="fbtn" hidden><svg class="ic" aria-hidden="true"><use href="#ui-sliders"/></svg><span>{{ s.filter }}</span></button>{% endif %}
 <p class="fstat" id="fstat" hidden aria-live="polite" data-n="{{ s.hidden_n }}" data-one="{{ s.hidden_1 }}"><span></span> <button type="button" id="freset">{{ s.reset }}</button></p>
 </nav>{% endif %}
 <main id="menu" tabindex="-1">
+{% if menu.specials %}<section class="today" id="today" aria-labelledby="today-h"><div class="today-card">
+<h2 class="eyebrow" id="today-h">{{ s.today }}</h2>
+<ul class="specials">{% for sp in menu.specials %}<li class="sp" id="sp-{{ forloop.counter }}" data-kind="{{ sp.kind }}"><div class="dish-text"><p class="sp-kind">{{ sp.kind_label }}</p><div class="dish-head"><h3 class="dish-name sp-title">{% if sp.description %}<a class="dish-link" href="#sp-{{ forloop.counter }}">{{ sp.title }}</a>{% else %}{{ sp.title }}{% endif %}</h3>{% if sp.prices %}<div class="dish-prices">{% include "public/_prices.html" with prices=sp.prices %}</div>{% endif %}</div>{% if sp.description %}<p class="dish-desc">{{ sp.description }}</p>{% endif %}</div></li>{% endfor %}</ul>
+</div></section>{% endif %}
 {% for cat in menu.categories %}<section class="cat" id="{{ cat.anchor }}" aria-labelledby="h-{{ cat.anchor }}">
 <header class="cat-head"><h2 id="h-{{ cat.anchor }}">{{ cat.name }}</h2>{% if cat.description %}<p class="cat-desc">{{ cat.description }}</p>{% endif %}</header>
 <ul class="dishes">{% for it in cat.items %}{% include "public/_dish.html" with first_cat=forloop.parentloop.first %}{% endfor %}</ul>
@@ -60,7 +60,7 @@
 <h3 class="s-h" id="s-dh" hidden>{{ s.diets }}</h3><ul class="s-tags" id="s-diets"></ul>
 <h3 class="s-h" id="s-ah" hidden>{{ s.allergens }}</h3><ul class="s-tags" id="s-al"></ul></div></div>
 </div></dialog>
-{% if menu.categories|length > 1 or menu.item_count >= 20 %}{% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<dialog class="sheet" id="filters" aria-labelledby="f-title"><div class="sheet-in">
+{% if menu.specials or menu.categories|length > 1 or menu.item_count >= 20 %}{% if menu.legend_allergens or menu.legend_diets or menu.item_count >= 20 %}<dialog class="sheet" id="filters" aria-labelledby="f-title"><div class="sheet-in">
 <button type="button" class="x" data-close aria-label="{{ s.close }}"><svg class="ic" aria-hidden="true"><use href="#ui-close"/></svg></button>
 <form class="sheet-body" id="fform" onsubmit="return false"><div class="grip" aria-hidden="true"></div>
 <h2 class="s-name" id="f-title">{{ s.filter_title }}</h2>

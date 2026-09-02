@@ -80,7 +80,8 @@ def test_inline_css_and_js_budgets():
         )
         assert len(css.encode()) <= 22 * 1024, (theme, len(css))
         assert len(gzip.compress(css.encode())) <= 5.5 * 1024, theme
-    assert len((ROOT / "static/public/js/menu.js").read_bytes()) <= 6 * 1024
+    js = (ROOT / "static/public/js/menu.js").read_bytes()  # readable source, served as is (no build step)
+    assert len(js) <= 10 * 1024 and len(gzip.compress(js)) <= 3.5 * 1024
 
 
 def test_icon_sprite_covers_every_code():
@@ -100,3 +101,10 @@ def test_font_files_exist_for_every_theme():
         for _family, _w, _style, stem in spec["faces"]:
             for subset in ("latin", "latin-ext"):
                 assert (fonts / f"{stem.format(s=subset)}.woff2").exists(), stem
+
+
+def test_specials_are_first_section_with_own_chip(restaurant):
+    html = _render(restaurant)
+    assert html.index('class="bar"') < html.index('id="today"') < html.index('id="cat-')
+    assert 'class="today-chip" href="#today"' in html
+    assert 'class="sp"' in html and "sp-row" not in html

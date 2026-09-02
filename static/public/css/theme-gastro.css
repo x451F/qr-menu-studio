@@ -3,25 +3,18 @@
   --font-display:"Cormorant Garamond","Cormorant Garamond Fallback",Georgia,serif;
   --font-body:"Jost","Jost Fallback",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --ff-name:var(--font-display);--ff-price:var(--font-body);
-  --h1:clamp(2.5rem,10vw,3.75rem);--h2:2.125rem;--fs-name:1.4375rem;--fs-desc:1rem;--fs-price:1rem;
+  --h1:clamp(2.125rem,9vw,3rem);--h2:2.125rem;--fs-name:1.4375rem;--fs-desc:1rem;--fs-price:1rem;
   --w-name:500;--w-price:500;--w-h:500;
   --radius:0;--radius-sm:0;--chip-r:0;--thumb-r:0;--density:1.5;--ta:center;--ai:center;--thumb:96px;
 }
 @media (min-width:720px){:root{--thumb:120px}}
-.head{padding-block:var(--s2) var(--s6)}
+.head{padding-block:var(--s1) var(--s4)}
 .name{letter-spacing:.02em;line-height:1}
-.name::after{content:"";display:block;width:40px;height:1px;margin:var(--s5) auto 0;background:var(--brand-ui)}
-.tagline{margin-top:var(--s4);font-size:.9375rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.name::after{content:"";display:block;width:40px;height:1px;margin:var(--s3) auto 0;background:var(--brand-ui)}
+.tagline{margin-top:var(--s3);font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
 .lang a{font-weight:500}
-.today-card{border:0;border-block:1px solid var(--line-strong);border-radius:0;background:none;text-align:center;padding:var(--s5) 0}
 .eyebrow{font-weight:500;letter-spacing:.2em;color:var(--brand-text)}
 .eyebrow::before,.eyebrow::after{content:"·";margin-inline:.6em}
-.sp-kind{font:italic 500 1.125rem/1.2 var(--font-display);color:var(--ink-2)}
-.sp-row{flex-direction:column;align-items:center;gap:var(--s1)}
-.sp-title{font:italic 500 1.875rem/1.1 var(--font-display)}
-.sp-row .dish-prices{max-width:none}.sp-row .pr{justify-content:center}
-.sp-desc{margin-inline:auto;max-width:26rem}
-.sp+.sp{border-top:0;padding-top:var(--s5)}
 .dish{border-bottom:0}
 .dish-name{letter-spacing:.005em;line-height:1.15}
 .dish-desc{line-height:1.6;max-width:30rem}
@@ -49,3 +42,9 @@
   .hours dl,.note{margin-inline:0}
   .foot .contact{justify-items:start}
 }
+.today-card{border:0;border-block:1px solid var(--line-strong);border-radius:0;background:none;padding:var(--s3) 0 var(--s1)}
+.sp-kind{font:italic 500 1rem/1.2 var(--font-display);color:var(--ink-2)}
+.sp-title{font:italic 500 1.3125rem/1.15 var(--font-display)}
+.sp+.sp{border-top:1px solid var(--line)}
+.bar a.today-chip,.bar a.today-chip[aria-current]{background:none;color:var(--brand-text);border-color:transparent}
+.bar a.today-chip[aria-current]{border-bottom-color:var(--brand-ui)}

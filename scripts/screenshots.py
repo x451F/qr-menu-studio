@@ -110,6 +110,18 @@ def matrix(args, browser):
         ctx.close()
 
 
+FIRST_SCREEN_JS = """() => {
+  const bar = document.querySelector('.bar');
+  const first = document.querySelector('.sp') || document.querySelector('.dish');
+  const H = innerHeight, r = {};
+  if (bar) { const b = bar.getBoundingClientRect(); r.bar = Math.round(b.bottom); r.barOk = b.top >= 0 && b.bottom <= H; }
+  else r.barOk = true;
+  const f = first.getBoundingClientRect();
+  r.first = Math.round(f.bottom); r.firstOk = f.top >= 0 && f.bottom <= H; r.H = H;
+  return r;
+}"""
+
+
 GATES_JS = """() => {
   const r = {};
   r.overflow = document.documentElement.scrollWidth - innerWidth;
@@ -157,6 +169,22 @@ def gates(args, browser):
             ok = False
             print("console errors:", set(errors))
         ctx.close()
+    return ok
+
+
+def first_screen(args, browser):
+    """Gate: at 375x812 (light) the chip bar and the first special (or first dish) are fully visible."""
+    ok = True
+    ctx = new_ctx(browser, 375)
+    pg = login(ctx, args.base)
+    for theme in args.themes:
+        pg.goto(url_for(args.base, slug_for(args, theme), theme, "light"))
+        pg.wait_for_load_state("networkidle")
+        r = pg.evaluate(FIRST_SCREEN_JS)
+        bad = not (r["barOk"] and r["firstOk"])
+        ok &= not bad
+        print("FAIL" if bad else "ok  ", "first screen", theme, r)
+    ctx.close()
     return ok
 
 
@@ -239,7 +267,8 @@ def main():
         browser = p.chromium.launch()
         ok = True
         if args.gates:
-            ok = gates(args, browser)
+            ok = first_screen(args, browser)
+            ok = gates(args, browser) and ok
         elif args.interactions:
             interactions(args, browser)
         elif not args.contact and not args.no_matrix:
