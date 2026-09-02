@@ -216,6 +216,9 @@ Test a restore on a scratch machine at least once.
   `docker compose up -d`.
 - **Web container keeps restarting.** `docker compose logs web`. With `DEBUG` off, an empty
   `DJANGO_SECRET_KEY` is a fatal error (the compose file provides a local default only).
+  When `PUBLIC_BASE_URL` starts with `https://`, the container also refuses to start with the
+  local-demo or `.env.example` placeholder values of `DJANGO_SECRET_KEY` / `ADMIN_PASSWORD`
+  ("Refusing to start: ..."): put real values in `.env`.
 - **Changed `.env` but nothing changed.** Run `docker compose up -d` again so the containers are recreated.
 - **A sold-out toggle is not visible to diners.** Pages are revalidated on every visit and cached
   by content version, so edits show within seconds. A stale page usually means a caching proxy
