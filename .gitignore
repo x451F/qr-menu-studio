@@ -1,13 +1,35 @@
+# Python / tooling
 .venv/
 __pycache__/
 *.pyc
-.env
-data/
-staticfiles/
 .pytest_cache/
 .ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets and local configuration: never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Runtime data (database, uploads, backups)
+data/
+*.sqlite3
+*.sqlite3-*
+media/
+backups/
+staticfiles/
+
+# Test and browser artefacts
 node_modules/
 test-results/
 playwright-report/
+
+# Editors and OS
+.idea/
+.vscode/
 .DS_Store
 /tmp/

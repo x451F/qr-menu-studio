@@ -1,0 +1,20 @@
+Copyright (c) 2026 Yaroslav. All rights reserved.
+
+This repository is made publicly visible so that its source code can be read and evaluated, for
+example by prospective employers or clients. Viewing the code on GitHub does not grant any
+licence to it.
+
+No permission is granted to use, copy, modify, merge, publish, distribute, sublicense, host as a
+service, or sell copies of this software or any substantial part of it, in source or compiled
+form, without prior written permission from the copyright holder.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT
+SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR
+ITS USE.
+
+Third-party components included in this repository remain under their own licences:
+- Fonts in static/public/fonts/ and static/printing/fonts/: SIL Open Font License 1.1
+  (licence files are next to the fonts).
+- static/editor/vendor/htmx.min.js: htmx, Zero-Clause BSD.
+- static/editor/vendor/Sortable.min.js: SortableJS, MIT.
+- Demo photos in menus/seed_assets/photos/: see menus/seed_assets/CREDITS.md.
