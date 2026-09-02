@@ -19,7 +19,7 @@
 .dish-name{letter-spacing:.005em;line-height:1.15}
 .dish-desc{line-height:1.6;max-width:30rem}
 .dish-prices{color:var(--ink);letter-spacing:.03em;padding-top:.35em}
-.pl{letter-spacing:.06em;text-transform:uppercase;font-size:.75rem}
+.pl{letter-spacing:.06em;text-transform:uppercase;font-size:.8125rem}
 .cat{padding-top:var(--s7)}
 .cat-head{text-align:center;margin-bottom:var(--s5)}
 .cat-head h2{font-style:italic}

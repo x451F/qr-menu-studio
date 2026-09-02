@@ -10,6 +10,7 @@
 {% if menu.preview %}<meta name="robots" content="noindex, nofollow">{% endif %}
 <meta property="og:type" content="restaurant.menu"><meta property="og:title" content="{{ menu.name }}">{% if menu.tagline %}<meta property="og:description" content="{{ menu.tagline }}">{% endif %}{% if menu.logo_url %}<meta property="og:image" content="{{ menu.logo_url }}">{% endif %}
 {% for l in menu.languages %}<link rel="alternate" hreflang="{{ l.code }}" href="{{ menu.public_url }}{{ l.url }}">{% endfor %}
+<link rel="icon" href="data:,">
 {% font_preloads menu.theme %}
 <style>{% font_css menu.theme %}{% theme_vars_css theme_vars %}{% inline_css menu.theme %}</style>
 <noscript><style>.dish-desc{display:block;-webkit-line-clamp:unset;line-clamp:unset}</style></noscript>
@@ -21,7 +22,7 @@
 <div class="page" data-photos="{{ pmode }}" data-count="{{ dens }}">
 <header class="head">
 {% if menu.languages %}<div class="lang" role="group" aria-label="{{ s.language }}">{% for l in menu.languages %}<a href="{{ l.url }}" hreflang="{{ l.code }}" lang="{{ l.code }}" title="{{ l.label }}"{% if l.active %} aria-current="true"{% endif %}>{{ l.short }}</a>{% endfor %}</div>{% endif %}
-<div class="id">{% if menu.logo_url %}<img class="logo" src="{{ menu.logo_url }}" alt="" fetchpriority="high" decoding="async">{% endif %}
+<div class="id">{% if menu.logo %}<img class="logo" src="{{ menu.logo.src }}" width="{{ menu.logo.width }}" height="{{ menu.logo.height }}" alt="" fetchpriority="high" decoding="async">{% endif %}
 <h1 class="name">{{ menu.name }}</h1>
 {% if menu.tagline %}<p class="tagline">{{ menu.tagline }}</p>{% endif %}</div>
 </header>

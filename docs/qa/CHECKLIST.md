@@ -23,8 +23,8 @@ and no "Aujourd'hui" section; the checks that need them use the other four menus
 | 10 | No horizontal scroll at 320/375/1280 | **PASS** | `scrollWidth == innerWidth` for all 5 menus x 3 widths, also with the sheet open. |
 | 11 | Footer: maps link, `tel:`, hours | **PASS** | All 5: `address a` -> `https://www.google.com/maps/search/?api=1&query=...`; `a.tel` -> `tel:+33...`; hours table has 1-4 rows (e.g. "Mardi - Samedi 12h - 14h, 19h - 22h"). |
 | 12 | 5-second test (375x812) | **PASS** | See below; screenshots `docs/qa/screens/fold-<slug>-375x812.png`. |
-| 13 | prefers-reduced-motion, transitions <= 200 ms | **PASS** (note) | Reduced: `scroll-behavior` not smooth, sheet `animation-name: none`. Longest transition/animation on any element: 200 ms (sheet-in, normal) and 150 ms (chip colour, also present under reduced motion). Note: the 150 ms colour transition is not switched off under reduced motion; harmless but not strictly "respected". |
-| 14 | Body >= 16 px, tabular numerals | **PASS** (note) | body 16-17 px, dish name 18-21, description 16-17, prices 16-19, address and hours 16-17; `font-variant-numeric: lining-nums tabular-nums` on every `.dish-prices` and hours row (7-89 checked per menu). Secondary text is smaller: `.note` 14, `.lang a` 14, `.pill` 13, legend 15, and on maison-vialle the tagline and chips are 13 px. |
+| 13 | prefers-reduced-motion, transitions <= 200 ms | **PASS** (note) | Reduced: `scroll-behavior` not smooth, sheet `animation-name: none`. Longest transition/animation on any element: 200 ms (sheet-in, normal) and 150 ms (chip colour, also present under reduced motion). Note: the 150 ms colour transition is not switched off under reduced motion; harmless but not strictly "respected". **Fixed:** chip colour transition now only under `prefers-reduced-motion: no-preference`. |
+| 14 | Body >= 16 px, tabular numerals | **PASS** (note) | body 16-17 px, dish name 18-21, description 16-17, prices 16-19, address and hours 16-17; `font-variant-numeric: lining-nums tabular-nums` on every `.dish-prices` and hours row (7-89 checked per menu). Secondary text is smaller: `.note` 14, `.lang a` 14, `.pill` 13, legend 15, and on maison-vialle the tagline and chips are 13 px. **Resolution:** kept by design (uppercase, letter-spaced labels); gastro price labels raised from 12 to 13 px. |
 | 15 | Light + dark for every theme; with/without photos | **PASS** | Admin preview `?preview=1&theme=T&mode=M&photos=0/1` on chez-gino (81 items), 5 themes x light/dark x photos on/off: `data-theme` applied, body background dark (luminance < 0.2) in dark and light in light, dish name contrast 12.7-17.8:1 and description 6.1-8.6:1, no horizontal scroll, photos absent with `photos=0` and present with `photos=1`. Screenshots `docs/qa/screens/theme-<theme>-<mode>-photos<0|1>.png`. |
 
 ## 12. Above the fold at 375x812 (bistrot-des-halles as the example)
@@ -48,8 +48,8 @@ tagline and a "Carte" heading with dishes straight away.
   `/admin/r/<pk>/import/` returns 200 with "AI import is turned off" and instructions, plus a back link.
 
 ## Bugs / observations to report (no app code was changed)
-1. `/favicon.ico` 404 on all menus (console error, Best Practices 96 -> 100 if fixed): `templates/public/menu.html` head.
-2. bistrot-des-halles Lighthouse Performance 94-95 (< 95 gate): bistro theme does not preload
-   `instrument-sans-latin-600-normal`, `public/theming.py:62` (hypothesis, see `docs/qa/lighthouse.md`).
-3. Minor: 13 px tagline and chips on maison-vialle (gastro), 14 px `.lang a` and `.note`, `.pill` 13 px.
-4. Minor: 150 ms colour transitions stay active under `prefers-reduced-motion` (`static/public/css/base.css:77`).
+1. ~~`/favicon.ico` 404 on all menus~~ **fixed** (`<link rel="icon">`, Best Practices 100).
+2. ~~bistrot-des-halles Lighthouse Performance 94-95~~ **fixed**: now 98-99 (small WebP header logo +
+   dish-name font preload), see `docs/qa/lighthouse.md`.
+3. Minor: 13 px tagline and chips on maison-vialle (gastro), 14 px `.lang a` and `.note`, `.pill` 13 px. Kept by design (labels, not body text); gastro price labels raised to 13 px.
+4. ~~Minor: 150 ms colour transitions stay active under `prefers-reduced-motion`~~ **fixed**.

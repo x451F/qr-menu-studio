@@ -53,26 +53,28 @@ PALETTES = {
 }
 
 # --- Fonts (Fontsource WOFF2 files vendored in static/public/fonts/) -----------------------------
-# (family, weight, style, file stem).  `preload` = the two faces above the fold.
+# (family, weight, style, file stem).  `preload` = the faces above the fold (display, body, dish name).
 THEME_FONTS = {
     "bistro": {
         "faces": [("Fraunces", 600, "normal", "fraunces-{s}-600-normal"),
                   ("Instrument Sans", 400, "normal", "instrument-sans-{s}-400-normal"),
                   ("Instrument Sans", 600, "normal", "instrument-sans-{s}-600-normal")],
-        "preload": ["fraunces-latin-600-normal", "instrument-sans-latin-400-normal"],
+        "preload": ["fraunces-latin-600-normal", "instrument-sans-latin-400-normal",
+                    "instrument-sans-latin-600-normal"],
     },
     "trattoria": {
         "faces": [("Young Serif", 400, "normal", "young-serif-{s}-400-normal"),
                   ("Figtree", 400, "normal", "figtree-{s}-400-normal"),
                   ("Figtree", 600, "normal", "figtree-{s}-600-normal"),
                   ("Figtree", 700, "normal", "figtree-{s}-700-normal")],
-        "preload": ["young-serif-latin-400-normal", "figtree-latin-400-normal"],
+        "preload": ["young-serif-latin-400-normal", "figtree-latin-400-normal", "figtree-latin-600-normal"],
     },
     "cafe": {
         "faces": [("Bricolage Grotesque", 700, "normal", "bricolage-grotesque-{s}-700-normal"),
                   ("Nunito Sans", 400, "normal", "nunito-sans-{s}-400-normal"),
                   ("Nunito Sans", 700, "normal", "nunito-sans-{s}-700-normal")],
-        "preload": ["bricolage-grotesque-latin-700-normal", "nunito-sans-latin-400-normal"],
+        "preload": ["bricolage-grotesque-latin-700-normal", "nunito-sans-latin-400-normal",
+                    "nunito-sans-latin-700-normal"],
     },
     "gastro": {
         "faces": [("Cormorant Garamond", 500, "normal", "cormorant-garamond-{s}-500-normal"),

@@ -17,6 +17,7 @@ from django.db.models import Prefetch, prefetch_related_objects
 from menus.constants import ALLERGENS, DIETS, SPECIAL_KINDS, SUPPORTED_LANGUAGES, THEMES
 from menus.formatting import format_price
 from menus.i18n import tr
+from menus.images import logo_view
 from menus.models import Category, Item, Restaurant
 
 
@@ -103,6 +104,7 @@ class MenuView:
     has_photos: bool
     item_count: int
     preview: bool = False
+    logo: dict | None = None  # {"src", "width", "height"}: small WebP for the header (logo_url stays the original)
     extra: dict = field(default_factory=dict)
 
 
@@ -222,6 +224,7 @@ def build_menu_context(
         slug=restaurant.slug,
         tagline=tr(restaurant.tagline, lang),
         logo_url=restaurant.logo.url if restaurant.logo else "",
+        logo=logo_view(restaurant.logo) if restaurant.logo else None,
         theme=theme,
         color_mode=mode,
         address=restaurant.address,

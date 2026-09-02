@@ -82,7 +82,7 @@ def _logo_saved(sender, instance, **kwargs):
     if new is _UNSET:
         return
     if old is not _UNSET and old and old != new:
-        delete_with_variants(instance.logo.storage, old, variants=False)
+        delete_with_variants(instance.logo.storage, old)
     instance._orig_logo = new
 
 
@@ -90,4 +90,4 @@ def _logo_saved(sender, instance, **kwargs):
 def _logo_deleted(sender, instance, **kwargs):
     name = _raw_name(instance, "logo")
     if name and name is not _UNSET:
-        delete_with_variants(instance.logo.storage, name, variants=False)
+        delete_with_variants(instance.logo.storage, name)

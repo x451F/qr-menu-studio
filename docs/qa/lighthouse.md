@@ -7,6 +7,29 @@ headless Chrome, one run per menu (bistrot re-run 3 more times, see below).
 Trimmed results: `docs/qa/lighthouse/<slug>.json` (scores, metrics, failing audits), and the full
 HTML report of the one menu under the gate: `docs/qa/lighthouse/bistrot-des-halles.report.html.gz`.
 
+## Final results (after fixes, 2026-09-02)
+
+Same stack (`docker compose -p qrmenu up -d --build`, seeded, no Anthropic key), Lighthouse 12 mobile
+defaults, **3 runs per menu** (min-max shown):
+
+| Menu | Theme | Perf | A11y | Best pr. | SEO | FCP | LCP | CLS | Weight | Gate |
+|---|---|---|---|---|---|---|---|---|---|---|
+| bistrot-des-halles | bistro | 98-99 | 100 | 100 | 100 | 0.8-0.9 s | 2.3 s | 0 | 377 KiB | pass |
+| chez-gino | trattoria | 99 | 100 | 100 | 100 | 1.1-1.2 s | 2.0-2.1 s | 0 | 187 KiB | pass |
+| petit-kiosque | cafe | 100 | 100 | 100 | 100 | 0.6-0.7 s | 1.5 s | 0 | 99 KiB | pass |
+| maison-vialle | gastro | 99 | 100 | 100 | 100 | 1.1-1.2 s | 2.0 s | 0.001 | 251 KiB | pass |
+| auberge-du-puy-blanc | auberge | 99-100 | 100 | 100 | 100 | 1.1-1.2 s | 1.8 s | 0 | 172 KiB | pass |
+
+Fixes applied after the first audit (below):
+- The header logo is now a small WebP variant fitted to 2x the 180x56 slot (`menus.images.logo_view`);
+  the bistro logo went from a 75 KB PNG at high priority to 8.7 KB. That PNG was competing with the fonts
+  for bandwidth under simulated Slow 4G, which delayed the LCP dish name.
+- The dish-name face is preloaded in the themes where it is not one of the two existing preloads
+  (bistro, trattoria, cafe).
+- `<link rel="icon">` on every page (no more `/favicon.ico` 404 console error -> Best Practices 100).
+
+## First audit (before fixes)
+
 | Menu | Theme | Perf | A11y | Best pr. | SEO | FCP | LCP | TBT | CLS | Weight | Gate (Perf and A11y >= 95) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | bistrot-des-halles | bistro | **94** | 100 | 96 | 100 | 0.9 s | 3.0 s | 0 ms | 0 | 442 KiB | **FAIL (Perf)** |

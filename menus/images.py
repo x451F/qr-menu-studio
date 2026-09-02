@@ -4,12 +4,14 @@ Public contract (used by the editor and the seed command):
     process_photo(file, name)  -> ContentFile   JPEG, <= 1600 px, EXIF-rotated, metadata stripped
     process_logo(file, name)   -> ContentFile   PNG with alpha, <= 512 px
     photo_view(field_file)     -> dict | None   {"src", "srcset", "width", "height"}
+    logo_view(field_file)      -> dict | None   {"src", "width", "height"} small WebP for the menu header
     ensure_variants(field_file)                 create the WebP variants next to the stored file
     delete_with_variants(storage, name)         remove a stored photo and its variants
 
 Variants live next to the original: ``photos/3/abc.jpg`` -> ``photos/3/abc.480.webp``,
 ``photos/3/abc.960.webp``. They are created on Item save (see signals.py) and lazily by
-``photo_view`` when missing. Variants are never upscaled.
+``photo_view`` when missing. Variants are never upscaled. Logos get one lazily created variant,
+``logos/x/abc.logo.webp``, fitted to 2x the header slot (the original PNG can weigh 50-100 KB).
 """
 
 import logging
@@ -26,6 +28,7 @@ logger = logging.getLogger(__name__)
 PHOTO_MAX = 1600
 LOGO_MAX = 512
 VARIANT_WIDTHS = (480, 960)
+LOGO_VARIANT_BOX = (360, 112)  # 2x the 180 x 56 px header slot (static/public/css/base.css .logo)
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 MAX_PIXELS = 60_000_000  # ~ 7750 x 7750; anything bigger is refused (decompression bombs)
 ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP", "GIF", "MPO", "BMP", "TIFF"}
@@ -131,8 +134,14 @@ def variant_name(name: str, width: int) -> str:
     return f"{base}.{width}.webp"
 
 
+def logo_variant_name(name: str) -> str:
+    """logos/x/abc.png -> logos/x/abc.logo.webp"""
+    base = name.rsplit(".", 1)[0] if "." in name.rsplit("/", 1)[-1] else name
+    return f"{base}.logo.webp"
+
+
 def _variant_names(name: str) -> list[str]:
-    return [variant_name(name, w) for w in VARIANT_WIDTHS]
+    return [variant_name(name, w) for w in VARIANT_WIDTHS] + [logo_variant_name(name)]
 
 
 def ensure_variants(field_file, *, force: bool = False) -> bool:
@@ -179,7 +188,7 @@ def delete_with_variants(storage, name: str, *, variants: bool = True) -> None:
             storage.delete(n)
         except OSError:
             logger.warning("Could not delete %s", n, exc_info=True)
-    cache.delete_many([f"imgdims:{name}", f"imgvar:{name}"])
+    cache.delete_many([f"imgdims:{name}", f"imgvar:{name}", f"logovar:{name}"])
 
 
 def _dimensions(field_file) -> tuple[int, int] | None:
@@ -231,3 +240,42 @@ def photo_view(field_file) -> dict | None:
         }
     except (OSError, ValueError):
         return None
+
+
+def logo_view(field_file) -> dict | None:
+    """Return {"src", "width", "height"} of the small WebP header logo (created on first use).
+
+    Falls back to the original file when the variant cannot be produced.
+    """
+    if not field_file:
+        return None
+    name = field_file.name
+    key = f"logovar:{name}"
+    view = cache.get(key)
+    if view:
+        return view
+    storage = field_file.storage
+    vname = logo_variant_name(name)
+    try:
+        if storage.exists(vname):
+            with storage.open(vname, "rb") as fh, Image.open(fh) as img:
+                size = img.size
+        else:
+            with storage.open(name, "rb") as fh:
+                img = Image.open(fh)
+                img.load()
+            img = img.convert("RGBA")
+            img.thumbnail(LOGO_VARIANT_BOX, Image.Resampling.LANCZOS)  # never upscales
+            out = BytesIO()
+            img.save(out, "WEBP", quality=85, method=6)
+            storage.save(vname, ContentFile(out.getvalue()))
+            size = img.size
+    except Exception:  # never break a render because of a variant
+        logger.exception("Could not create the logo variant for %s", name)
+        dims = _dimensions(field_file)
+        if dims is None:
+            return None
+        return {"src": field_file.url, "width": dims[0], "height": dims[1]}
+    view = {"src": storage.url(vname), "width": size[0], "height": size[1]}
+    cache.set(key, view, _DIMS_TTL)
+    return view
