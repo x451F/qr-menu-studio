@@ -32,9 +32,8 @@ QR visitors are mostly first-time on 4G, so a second blocking request costs more
 ```
 <a class="skip">Aller à la carte</a>
 <header>      lang switch (top-right) · logo · h1 name · tagline
-<section id="today">   "Plat du jour / Formule" block (only if specials)
-<nav>         sticky category chips  (+ "Filtrer" button when JS)
-<main>        <section id="cat-N"> h2 + description + <ul class="dishes"> rows
+<nav>         sticky category chips, first chip "Aujourd'hui" when specials (+ "Filtrer" button when JS)
+<main>        <section id="today"> specials (only if any), then <section id="cat-N"> h2 + description + <ul class="dishes"> rows
 <section id="legend">  allergen & diet legend (only codes used on this menu)
 <footer>      address → maps, phone → tel:, hours, footer note
 <dialog class="sheet" id="sheet">   dish detail   (JS only)
@@ -379,7 +378,7 @@ One SVG sprite of 17 `<symbol>`s, `viewBox="0 0 24 24"`. Public pages inline **o
 | HTML (80 dishes, 5 photos) | proposed <= 9 KB gzip; **as built ~15 KB gzip / 110 KB raw** for the 81-dish seed (per-row `data-*`, icon `<use>`s and hidden labels); 5-dish page ~5 KB gzip |
 | Inline CSS (base + theme, minified) | proposed <= 13 KB raw / 4.5 KB gzip; **as built ~19.5 KB raw / ~5.1 KB gzip** (PLAN ceiling 20 KB gz). Enforced by `test_templates.py` (<= 22 KB raw, <= 5.5 KB gz) |
 | Fonts | 3 to 4 WOFF2 latin files per theme, <= 75 KB total, <= 40 KB render-blocking (2 preloaded: display face + body regular). `latin-ext` only through `unicode-range` |
-| JS | one deferred file `menu.js`, **5.2 KB min / 2.4 KB gz**, no dependencies (source `menu.src.js`, rebuilt with `npx esbuild ... --minify`). Features: scroll-spy, sheet + history + swipe, search/filter. Everything else is CSS. |
+| JS | one deferred file `menu.js`, **readable source served as is (no build step): ~8.2 KB raw / ~3.0 KB gz**, no dependencies. Features: scroll-spy, sheet + history + swipe, search/filter. Everything else is CSS. Enforced by `test_templates.py` (<= 10 KB raw, <= 3.5 KB gz) |
 | Images | thumbnails `srcset` 480/960 WebP via `PhotoView`, `sizes="88px"` (`112px` >= 720 px), `loading="lazy" decoding="async"`, explicit `width`/`height`, first 4 thumbs eager. Sheet image loaded on open. Fixed thumb boxes (no CLS) |
 | Requests on first load | HTML + 2 fonts (+ `menu.js`) + thumbs; nothing third-party; no analytics |
 | Lighthouse (mobile, throttled) | Performance >= 95, Accessibility >= 95 (aim 100), Best Practices >= 95, CLS < 0.02, LCP < 1.8 s |
@@ -440,9 +439,7 @@ safety wording shown in the filter sheet. (2) Inline used-symbol sprite approved
   have no visible affordance, and linked rows show none either (press/hover tint only), so the menu stays visually consistent.
 - **b. Row descriptions clamp to 2 lines** (`line-clamp`); the sheet shows the full text. A `<noscript><style>` un-clamps the text without JS.
   Any row with a description is a link, so every clamped description opens the sheet.
-- **c. `content-visibility: auto` kept** (`.cat{content-visibility:auto;contain-intrinsic-size:auto 900px}`) after testing: on the 81-dish seed
-  and an 80-item local menu, every chip jump (down and up, 375 and 1280 px) and cold `#cat-N` loads land the heading at the same offset under the
-  sticky bar (deviation <= 4 px). Re-test if category markup changes.
+- **c. `content-visibility: auto` was tried and then removed** (second review): it left unpainted bands in full-page screenshots for little gain at <= 80 dishes.
 - **d. Bistro leaders only on single-price rows** (the `.lead` element is only rendered when there is exactly one price).
 - **e. Lighthouse measured on a production-like server** (`docs/screenshots/lighthouse.txt`): performance 97-100, accessibility 100, best practices 100, SEO 100.
 - **f. Preview:** no visible chrome; `noindex, nofollow` meta only.
@@ -463,3 +460,19 @@ safety wording shown in the filter sheet. (2) Inline used-symbol sprite approved
 - Icons: 14 allergens, 3 diets (circle badge) and 7 UI icons; sprite 7.4 KB; the shrimp glyph is the weakest at 16 px.
 - `public/tests/test_templates.py` (in addition to `test_theming.py`) covers rendering for 5 themes x 3 modes, budgets, sprite and font coverage.
 - `scripts/screenshots.py` also runs the gates: overflow at 320/375/1280, tap targets >= 44 px, console errors, axe-core (WCAG 2 A/AA + best practices) with `--gates --axe <axe.min.js>`.
+
+---
+
+## 11. Second review round (first screen, plain JS, photo gutter)
+
+- **Chip bar directly after the header; specials are the first section of `<main>`** (`#today`) with their own first chip "Aujourd'hui" / "Today"
+  (accent-styled, `.today-chip`). Scroll-spy treats `#today` like a category; the filter never hides it.
+- **Specials use the dish-row anatomy on every viewport:** small kind eyebrow, title left (<= 1.1875rem, 1.3125rem in gastro's italic serif), price(s) right,
+  description clamped to 2 lines with JS and shown in full in the sheet (title is a `dish-link`; the sheet is shared with dishes). Multi-price specials
+  ("Formule") put label | amount rows full width under the title. No centred stacks; each theme keeps its frame (ticket, green card, enamel sign, hairlines, pastel card), only tighter.
+- **Tighter header on mobile:** logo <= 56 px, smaller gaps, tagline 1rem or less, smaller h1 clamps.
+- **Gate (in `scripts/screenshots.py --gates`):** at 375x812 (light) the chip bar and the first special (or first dish) are fully visible, for all five seed menus
+  (chip bar bottom at 256-291 px, first special bottom at 435-520 px; the 5-dish cafe has no bar and shows its first dish).
+- **`content-visibility` removed; `menu.js` served as readable source** (`menu.src.js` deleted, no build step).
+- **Per-category photo gutter at >= 720 px:** in a category where at least one dish has a photo, dishes without a photo reserve the thumbnail width,
+  so all prices of that category share one right edge (`.cat:has(.dish-thumb) .dish:not(:has(.dish-thumb))`). Not applied in all-photos mode (grid rows). Mobile unchanged.

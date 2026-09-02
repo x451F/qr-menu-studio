@@ -41,8 +41,14 @@ Problems and fixes:
 - SEO 91: `hreflang` links were relative. Now absolute (`public_url` + `?lang=`), self-reference included: SEO 100.
 - Logo `fetchpriority=high`. Performance 97-100, Accessibility 100 on all five seed menus.
 
+## Iteration 5 (review round 2: first screen, content-visibility, minify, photo alignment)
+Seen: at 375x812 trattoria, gastro and auberge showed only the header and a tall centred specials block; no chips, no dish.
+Fixes: chip bar right after the header; specials moved into `main` as the first section with an accent "Aujourd'hui" chip; specials rebuilt on the dish-row
+anatomy (left-aligned, price right, 2-line clamp, shared sheet), capped title size; header tightened (logo 56 px, smaller h1/tagline/gaps).
+Result (gate, light, 375x812): chip bar bottom 256/291/-/282/270 px and first special bottom 438/520/283 (first dish, no bar)/516/435 px, all <= 812.
+Also: `content-visibility` removed (unpainted band in the bistro full-page shot); `menu.js` served readable; per-category thumbnail gutter at >= 720 px so prices
+of a category share one right edge (verified on the bistro 1280 full page). Follow-up found while checking: single-price special titles wrapped the price
+under them (flex-wrap on every head); wrapping is now limited to multi-price specials.
+
 ## Open observations (not fixed)
-- In "some photos" mode on desktop the price of photo rows sits left of its thumbnail, so prices of rows with and
-  without photos do not share one right edge. Alternative (reserve the thumbnail gutter on every row of a category
-  that has photos) trades whitespace for alignment; left to the restaurant owner to judge with real menus.
 - Shrimp icon is the weakest glyph at 16 px.
