@@ -172,6 +172,7 @@ dialog.sheet::backdrop{background:var(--scrim)}
 .s-photo{aspect-ratio:4/3;background:var(--brand-soft)}
 .s-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .s-photo:empty{display:none}
+.s-photo:empty+.s-main .dish-head{padding-right:32px}
 .s-main,#fform>*:not(.grip){padding-inline:var(--s5)}
 .s-main{padding-top:var(--s4)}
 .s-name{flex:1;min-width:0;padding-right:44px;font:var(--w-h) 1.5rem/1.2 var(--font-display);text-wrap:balance;overflow-wrap:anywhere}
