@@ -125,9 +125,7 @@ def test_qr_png_decodes_to_public_url(make_restaurant, admin_ctx):
     add_dish(page)
     url = public_path(page, pk)
     png = admin_ctx.request.get(f"/admin/r/{pk}/qr.png?color=brand&size=512").body()
-    decoded = decode_qr(png)
-    assert decoded is not None, "opencv unavailable: QR not decoded"
-    assert decoded == BASE + url
+    assert decode_qr(png) == BASE + url
 
 
 def test_ai_disabled_service_level():

@@ -12,6 +12,5 @@ uv run pytest e2e -k main_flow         # just the main flow (375 px and 1280 px)
 ```
 
 `testpaths` in pyproject does not include `e2e`, so always pass the path.
-QR decoding uses OpenCV through `uv run --with opencv-python-headless` (network needed the first
-time); if unavailable the test falls back to comparing the URL on the print page and skips the decode.
+QR codes are decoded with `zxing-cpp` (dev dependency) and compared with the public URL.
 Known app bugs are marked `xfail` with their id (see `docs/qa/`).

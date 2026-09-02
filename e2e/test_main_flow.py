@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import io
 import re
-import subprocess
-import tempfile
 from pathlib import Path
 
 import pytest
+import zxingcpp
 from PIL import Image
 from playwright.sync_api import expect
 
@@ -15,25 +15,10 @@ from .conftest import ADMIN_PASS, ADMIN_USER, BASE, SAMPLE_MENU, login  # noqa: 
 
 NAME = "Le Café des Tests"
 
-DECODE = (
-    "import cv2,sys;"
-    "d=cv2.QRCodeDetector().detectAndDecode(cv2.imread(sys.argv[1]))[0];print(d)"
-)
-
-
-def decode_qr(png: bytes):
-    """Decode a QR PNG with OpenCV via uv; None if opencv can't be obtained."""
-    with tempfile.NamedTemporaryFile(suffix=".png") as f:
-        f.write(png)
-        f.flush()
-        try:
-            out = subprocess.run(
-                ["uv", "run", "--with", "opencv-python-headless", "python", "-c", DECODE, f.name],
-                capture_output=True, text=True, timeout=240, check=True,
-            )
-        except Exception:
-            return None
-    return out.stdout.strip()
+def decode_qr(png: bytes) -> str | None:
+    """Decode a QR PNG (zxing-cpp, a dev dependency); None if no code is found."""
+    results = zxingcpp.read_barcodes(Image.open(io.BytesIO(png)))
+    return results[0].text if results else None
 
 
 def drag(page, source, target):
@@ -76,7 +61,7 @@ def test_main_flow(make_context, tmp_path, width):
     expect(page.locator("h1.h1")).to_have_text(NAME)
 
     # 3. import a photo (fake AI)
-    page.get_by_role("link", name="Import from photo").first.click()
+    page.get_by_role("link", name="Import photo").first.click()
     page.wait_for_url(f"**/admin/r/{pk}/import/")
     page.set_input_files("#ai-files", str(SAMPLE_MENU))
     expect(page.locator("#ai-thumbs li")).to_have_count(1)
@@ -192,9 +177,7 @@ def test_main_flow(make_context, tmp_path, width):
     assert re.fullmatch(rf"{re.escape(BASE)}/m/[a-z0-9-]+/", public_url), public_url
     png = ctx.request.get(f"/admin/r/{pk}/qr.png?color=black&size=1024")
     assert png.ok and png.body()[:4] == b"\x89PNG"
-    decoded = decode_qr(png.body())
-    if decoded is not None:
-        assert decoded == public_url
+    assert decode_qr(png.body()) == public_url
 
     # 7. print PDFs (before logging out; admin session)
     for path, tag in [
