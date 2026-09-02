@@ -1,0 +1,37 @@
+{
+ "url": "http://localhost:8080/m/bistrot-des-halles/",
+ "lighthouse": "13.5.0",
+ "formFactor": "mobile",
+ "throttling": "simulate",
+ "scores": {
+  "performance": 94,
+  "accessibility": 100,
+  "best-practices": 96,
+  "seo": 100
+ },
+ "metrics": {
+  "first-contentful-paint": "0.9 s",
+  "largest-contentful-paint": "3.0 s",
+  "total-blocking-time": "0 ms",
+  "cumulative-layout-shift": "0",
+  "speed-index": "1.0 s",
+  "total-byte-weight": "Total size was 442 KiB"
+ },
+ "failed_audits": [
+  {
+   "id": "largest-contentful-paint",
+   "title": "Largest Contentful Paint",
+   "score": 0.77
+  },
+  {
+   "id": "errors-in-console",
+   "title": "Browser errors were logged to the console",
+   "score": 0
+  },
+  {
+   "id": "network-dependency-tree-insight",
+   "title": "Network dependency tree",
+   "score": 0
+  }
+ ]
+}

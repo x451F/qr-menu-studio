@@ -1,0 +1,32 @@
+{
+ "url": "http://localhost:8080/m/maison-vialle/",
+ "lighthouse": "13.5.0",
+ "formFactor": "mobile",
+ "throttling": "simulate",
+ "scores": {
+  "performance": 99,
+  "accessibility": 100,
+  "best-practices": 96,
+  "seo": 100
+ },
+ "metrics": {
+  "first-contentful-paint": "1.2 s",
+  "largest-contentful-paint": "2.1 s",
+  "total-blocking-time": "0 ms",
+  "cumulative-layout-shift": "0",
+  "speed-index": "1.2 s",
+  "total-byte-weight": "Total size was 269 KiB"
+ },
+ "failed_audits": [
+  {
+   "id": "errors-in-console",
+   "title": "Browser errors were logged to the console",
+   "score": 0
+  },
+  {
+   "id": "network-dependency-tree-insight",
+   "title": "Network dependency tree",
+   "score": 0
+  }
+ ]
+}
