@@ -8,10 +8,10 @@ mkdir -p "${DATA_DIR:-/data}/media" "${DATA_DIR:-/data}/backups"
 case "${PUBLIC_BASE_URL:-}" in
   https://*)
     case "${DJANGO_SECRET_KEY:-}" in
-      ""|insecure-*|change-me*) echo "Refusing to start: set a real DJANGO_SECRET_KEY in .env (see README)." >&2; exit 1 ;;
+      ""|insecure-*|change-me*) echo "Refusing to start: set a real DJANGO_SECRET_KEY in .env (see docs/DEPLOYMENT.md)." >&2; exit 1 ;;
     esac
     case "${ADMIN_PASSWORD:-}" in local-admin-password|change-me*)
-      echo "Refusing to start: set your own ADMIN_PASSWORD in .env, or leave it empty (see README)." >&2; exit 1 ;;
+      echo "Refusing to start: set your own ADMIN_PASSWORD in .env, or leave it empty (see docs/DEPLOYMENT.md)." >&2; exit 1 ;;
     esac
     ;;
 esac
